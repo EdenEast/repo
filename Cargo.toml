@@ -9,6 +9,8 @@ edition = "2018"
 [dependencies]
 clap = "^2.33.0"
 anyhow = "^1.0.27"
+url = "^2.1.1"
+regex = "^1.3.5"
 
 [[bin]]
 name = "repo"
