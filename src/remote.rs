@@ -1,7 +1,9 @@
+use crate::Query;
 use crate::ScpPath;
 use anyhow::Result;
 use url::Url;
 
+#[derive(Debug, Clone, PartialEq)]
 pub struct Remote {
     pub name: String,
     pub url: Url,
@@ -19,6 +21,22 @@ impl Remote {
         Ok(Self {
             name: name.into(),
             url: scp.to_url(),
+        })
+    }
+
+    pub fn from_query<S, Q>(name: S, query: Q) -> Result<Self>
+    where
+        S: Into<String>,
+        Q: Into<Query>,
+    {
+        let url = match query.into() {
+            Query::Url(url) => url,
+            Query::Scp(scp) => scp.to_url(),
+        };
+
+        Ok(Self {
+            name: name.into(),
+            url: url.into(),
         })
     }
 }
