@@ -37,7 +37,7 @@ impl Remote {
 
         Ok(Self {
             name: name.into(),
-            url: url.into(),
+            url,
         })
     }
 }
