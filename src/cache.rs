@@ -61,6 +61,32 @@ impl Cache {
         Ok(())
     }
 
+    /// Adds a tag to the cache
+    ///
+    /// Adding a tag to the cache will also write the tag to disk
+    pub fn add_tag(&mut self, tag: Tag, location: Location, config: &Config) -> Result<()> {
+        if self.has_tag(&tag.name) {
+            return Err(anyhow!("Tag: {} already exist in repo", tag.name));
+        }
+
+        self.write_tag(&tag, &location, &config)?;
+
+        let name = tag.name.clone();
+        match location {
+            Location::Global => {
+                self.global.tags.insert(name, tag);
+            }
+            Location::Local => {
+                if let Some(local) = &mut self.local {
+                    local.tags.insert(name, tag);
+                }
+            }
+        };
+
+        Ok(())
+    }
+
+    /// Check if cache contains a repository with the name as a key
     pub fn has_repository(&self, name: &str) -> bool {
         if let Some(local) = self.local.as_ref() {
             if local.repositories.contains_key(name) {
@@ -69,6 +95,16 @@ impl Cache {
         }
 
         self.global.repositories.contains_key(name)
+    }
+
+    pub fn has_tag(&self, name: &str) -> bool {
+        if let Some(local) = self.local.as_ref() {
+            if local.tags.contains_key(name) {
+                return true;
+            }
+        }
+
+        self.global.tags.contains_key(name)
     }
 
     fn write_repository(
@@ -84,10 +120,26 @@ impl Cache {
                 .map(|path| path.join("repository"))
                 .expect("Local location specified but local configuration not found"),
         };
+
         let file = path.join(format!("{}.toml", &repository.name));
-        println!("file: {:#?}", file);
         util::write_content(file, |f| {
-            let ser = toml::to_string_pretty(repository)?;
+            let ser = toml::to_string_pretty(&repository)?;
+            f.write_fmt(format_args!("{}", ser)).map_err(Into::into)
+        })
+    }
+
+    fn write_tag(&self, tag: &Tag, location: &Location, config: &Config) -> Result<()> {
+        let path = match location {
+            Location::Global => config.global_path().join("tag"),
+            Location::Local => config
+                .local_path()
+                .map(|path| path.join("tag"))
+                .expect("Local location specified but location configuration not found"),
+        };
+
+        let file = path.join(format!("{}.toml", &tag.name));
+        util::write_content(file, |f| {
+            let ser = toml::to_string_pretty(&tag)?;
             f.write_fmt(format_args!("{}", ser)).map_err(Into::into)
         })
     }
