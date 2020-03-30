@@ -15,10 +15,12 @@ lazy_static! {
             util::make_path_buf(path).expect("failed to convert REPO_CONFIG_PATH into a PathBuf")
         }
         Err(_) => {
-            dirs::config_dir().map(|path| path.join("repo")).unwrap_or(
-                util::make_path_buf("~/.config/repo")
-                    .expect("failed to determine the global configuration path"),
-            )
+            dirs::config_dir()
+                .map(|path| path.join("repo"))
+                .unwrap_or_else(|| {
+                    util::make_path_buf("~/.config/repo")
+                        .expect("failed to determine the global configuration path")
+                })
         }
     };
     pub static ref LOCAL_CONFIG_PATH: PathBuf = match env::var("REPO_LOCAL_PATH") {
@@ -28,10 +30,10 @@ lazy_static! {
         Err(_) => {
             dirs::data_local_dir()
                 .map(|path| path.join("repo"))
-                .unwrap_or(
+                .unwrap_or_else(|| {
                     util::make_path_buf("~/.local/share/repo")
-                        .expect("failed to determine the local configuration path"),
-                )
+                        .expect("failed to determine the local configuration path")
+                })
         }
     };
 }
@@ -77,8 +79,8 @@ impl ConfigData {
         let exclude_tags = raw.exclude.unwrap_or_default();
 
         Ok(Self {
-            root: root,
-            use_cli: use_cli,
+            root,
+            use_cli,
             host: default_host.to_owned(),
             include: include_tags,
             exclude: exclude_tags,
