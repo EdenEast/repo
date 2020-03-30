@@ -1,6 +1,4 @@
-use crate::Cache;
-use crate::Config;
-use crate::Location;
+use crate::{Cache, Config, Location};
 use anyhow::Result;
 
 pub struct Workspace {
