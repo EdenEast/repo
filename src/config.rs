@@ -141,4 +141,13 @@ impl Config {
             local_data: local_config,
         })
     }
+
+    pub fn global_path(&self) -> &Path {
+        self.global_data.path.as_path()
+    }
+
+    pub fn local_path(&self) -> Option<&Path> {
+        self.local_data.as_ref().map(|data| data.path.as_path())
+        // self.local_data.path.as_path()
+    }
 }

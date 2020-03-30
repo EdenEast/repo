@@ -1,26 +1,25 @@
 use crate::{Remote, Tag};
 use anyhow::Result;
+use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Repository {
     pub name: String,
-    pub path: PathBuf,
     pub remotes: Vec<Remote>,
-    pub tags: Vec<Tag>,
+    pub tags: Vec<String>,
 }
 
 pub struct RepositoryBuilder {
     name: String,
-    path: Option<PathBuf>,
     remotes: Vec<Remote>,
-    tags: Vec<Tag>,
+    tags: Vec<String>,
 }
 
 impl RepositoryBuilder {
     pub fn new(name: &str) -> Self {
         Self {
             name: name.to_owned(),
-            path: None,
             remotes: Vec::new(),
             tags: Vec::new(),
         }
@@ -31,7 +30,7 @@ impl RepositoryBuilder {
         self
     }
 
-    pub fn tag(mut self, tag: Tag) -> Self {
+    pub fn tag(mut self, tag: String) -> Self {
         self.tags.push(tag);
         self
     }
@@ -39,7 +38,6 @@ impl RepositoryBuilder {
     pub fn build(self) -> Repository {
         Repository {
             name: self.name,
-            path: self.path.unwrap_or_default(),
             remotes: self.remotes,
             tags: self.tags,
         }

@@ -1,9 +1,10 @@
 use crate::Query;
 use crate::ScpPath;
 use anyhow::Result;
+use serde::{Deserialize, Serialize};
 use url::Url;
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Remote {
     pub name: String,
     pub url: Url,
