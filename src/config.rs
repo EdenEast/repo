@@ -2,12 +2,13 @@ use crate::util;
 use anyhow::Result;
 use lazy_static::lazy_static;
 use serde::{Deserialize, Serialize};
-use std::convert::{TryFrom, TryInto};
-use std::env;
-use std::fs::File;
-use std::io::Read;
-use std::path::Path;
-use std::path::PathBuf;
+use std::{
+    convert::{TryFrom, TryInto},
+    env,
+    fs::File,
+    io::Read,
+    path::{Path, PathBuf},
+};
 
 lazy_static! {
     pub static ref GLOBAL_CONFIG_PATH: PathBuf = match env::var("REPO_CONFIG_PATH") {

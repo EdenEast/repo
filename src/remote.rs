@@ -1,5 +1,4 @@
-use crate::Query;
-use crate::ScpPath;
+use crate::{Query, ScpPath};
 use anyhow::Result;
 use serde::{Deserialize, Serialize};
 use url::Url;

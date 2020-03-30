@@ -1,7 +1,9 @@
 use anyhow::Result;
-use std::borrow::Borrow;
-use std::fs;
-use std::path::{Path, PathBuf};
+use std::{
+    borrow::Borrow,
+    fs,
+    path::{Path, PathBuf},
+};
 
 pub fn make_path_buf<S: AsRef<str>>(s: S) -> Result<PathBuf> {
     shellexpand::full(s.as_ref())

@@ -1,9 +1,10 @@
-use crate::util;
-use crate::{Config, Location, Repository, Tag};
+use crate::{util, Config, Location, Repository, Tag};
 use anyhow::{anyhow, Result};
-use std::collections::HashMap;
-use std::io::Write;
-use std::path::{Path, PathBuf};
+use std::{
+    collections::HashMap,
+    io::Write,
+    path::{Path, PathBuf},
+};
 
 #[derive(Debug)]
 pub struct Cache {
