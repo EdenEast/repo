@@ -6,8 +6,8 @@ use std::path::PathBuf;
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Repository {
     pub name: String,
-    pub remotes: Vec<Remote>,
     pub tags: Vec<String>,
+    pub remotes: Vec<Remote>,
 }
 
 pub struct RepositoryBuilder {
