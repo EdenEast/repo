@@ -9,6 +9,7 @@ use url::Url;
 ///
 /// * `<scheme>://[<username>[:<password>]@]<host>/<path-to-repo>.git`
 ///   - Available schemes are: `http[s]`, `ssh` and `git`.
+///   - Example: https://github.com/user/repo
 /// * `<username>@<host>:<path-to-repo>`
 ///   - Equivalent to `ssh://<username>@<host>/<path-to-repo>.git`
 pub enum Query {
