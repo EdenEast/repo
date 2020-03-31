@@ -1,5 +1,5 @@
 use crate::util;
-use anyhow::Result;
+use anyhow::{anyhow, Context, Result};
 use lazy_static::lazy_static;
 use serde::{Deserialize, Serialize};
 use std::{
@@ -58,7 +58,6 @@ pub struct ConfigData {
     host: String,
     include: Vec<String>,
     exclude: Vec<String>,
-
     path: PathBuf,
 }
 
@@ -85,20 +84,22 @@ impl ConfigData {
             host: default_host.to_owned(),
             include: include_tags,
             exclude: exclude_tags,
-
-            // TODO: Fill this in
-            path: PathBuf::default(),
+            path: raw.path,
         })
     }
 }
 
 impl ConfigData {
-    fn from_path<P: AsRef<Path>>(path: P) -> Result<ConfigData> {
-        let mut content = String::new();
-        File::open(path.as_ref())?.read_to_string(&mut content)?;
-
-        let mut raw: RawConfigData = toml::from_str(&content)?;
-        raw.path = path.as_ref().to_path_buf();
+    fn from_path<P>(path: P) -> Result<ConfigData>
+    where
+        P: AsRef<Path> + std::fmt::Debug,
+    {
+        let content = util::read_content(&path)?;
+        let mut raw: RawConfigData = toml::from_str(&content).context(format!(
+            "could not serialize content into Config:\n\n{}",
+            content
+        ))?;
+        raw.path = PathBuf::from(path.as_ref().parent().unwrap());
         raw.try_into()
     }
 }
@@ -126,16 +127,26 @@ impl Default for ConfigData {
 impl Config {
     pub fn new() -> Result<Self> {
         let global_path: &Path = &*GLOBAL_CONFIG_PATH;
-        let global_config: ConfigData = if global_path.is_file() {
-            ConfigData::from_path(&*GLOBAL_CONFIG_PATH)?
+        let global_file = global_path.join("config.toml");
+
+        debug!("Looking for global config file: {:#?}", global_file);
+        let global_config: ConfigData = if global_file.is_file() {
+            debug!("Found file: {:#?}", global_file);
+            ConfigData::from_path(global_file)?
         } else {
+            debug!("Failed to find file: {:#?}", global_file);
             ConfigData::default()
         };
 
         let local_path: &Path = &*LOCAL_CONFIG_PATH;
-        let local_config: Option<ConfigData> = if local_path.is_file() {
-            Some(ConfigData::from_path(&*LOCAL_CONFIG_PATH)?)
+        let local_file = local_path.join("config.toml");
+
+        debug!("Looking for local config file: {:#?}", local_file);
+        let local_config: Option<ConfigData> = if local_file.is_file() {
+            debug!("Found file: {:#?}", local_file);
+            Some(ConfigData::from_path(local_file)?)
         } else {
+            debug!("Failed to find file: {:#?}", local_file);
             None
         };
 
@@ -151,6 +162,5 @@ impl Config {
 
     pub fn local_path(&self) -> Option<&Path> {
         self.local_data.as_ref().map(|data| data.path.as_path())
-        // self.local_data.path.as_path()
     }
 }
