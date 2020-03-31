@@ -1,7 +1,8 @@
-use anyhow::Result;
+use anyhow::{Context, Result};
 use std::{
     borrow::Borrow,
-    fs,
+    fs::{File, OpenOptions},
+    io::Read,
     path::{Path, PathBuf},
 };
 
@@ -11,16 +12,47 @@ pub fn make_path_buf<S: AsRef<str>>(s: S) -> Result<PathBuf> {
         .map_err(Into::into)
 }
 
+pub fn read_content<P>(path: P) -> Result<String>
+where
+    P: AsRef<Path> + std::fmt::Debug,
+{
+    let mut content = String::new();
+    File::open(&path)
+        .context(format!("failed to open file: {:#?}", path))?
+        .read_to_string(&mut content)
+        .context(format!("failed to read file: '{:#?}'", path))?;
+
+    Ok(content)
+}
+
 pub fn write_content<P, F>(path: P, write_fn: F) -> Result<()>
 where
     P: AsRef<Path>,
-    F: FnOnce(&mut fs::File) -> Result<()>,
+    F: FnOnce(&mut File) -> Result<()>,
 {
     std::fs::create_dir_all(path.as_ref().parent().unwrap())?;
-    let mut file = fs::OpenOptions::new()
+    let mut file = OpenOptions::new()
         .write(true)
         .create(true)
         .truncate(true)
         .open(&path)?;
     write_fn(&mut file)
+}
+
+#[cfg(not(windows))]
+pub fn canonicalize<P: AsRef<Path>>(path: P) -> Result<PathBuf> {
+    path.as_ref().canonicalize().map_err(Into::into)
+}
+
+#[cfg(windows)]
+pub fn canonicalize<P: AsRef<Path>>(path: P) -> Result<PathBuf> {
+    path.as_ref()
+        .canonicalize()
+        .map_err(Into::into)
+        .map(|path| {
+            path.to_string_lossy()
+                .trim_start_matches(r"\\?\")
+                .replace("\\", "/")
+        })
+        .map(PathBuf::from)
 }

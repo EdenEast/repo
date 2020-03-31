@@ -17,6 +17,9 @@ dirs = "^2.0.2"
 toml = "^0.5.6"
 serde = { version = "^1.0.105", features = ["derive"] }
 glob = "^0.3.0"
+log = "^0.4.8"
+pretty_env_logger = "^0.4.0"
+better-panic = "^0.2.0"
 
 [[bin]]
 name = "repo"

@@ -1,5 +1,9 @@
 #![allow(dead_code)]
 #![allow(unused_imports)]
+
+#[macro_use]
+extern crate log;
+
 pub use cache::Cache;
 pub use config::Config;
 pub use location::Location;
@@ -10,10 +14,11 @@ pub use scp::ScpPath;
 pub use tag::Tag;
 pub use workspace::Workspace;
 
+pub mod prelude;
 pub mod util;
 
 mod cache;
-pub mod config;
+mod config;
 mod location;
 mod query;
 mod remote;

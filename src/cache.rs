@@ -1,5 +1,5 @@
 use crate::{util, Config, Location, Repository, Tag};
-use anyhow::{anyhow, Result};
+use anyhow::{anyhow, Context, Result};
 use std::{
     collections::HashMap,
     io::Write,
@@ -20,9 +20,14 @@ pub struct CacheData {
 
 impl Cache {
     pub fn new(config: &Config) -> Result<Self> {
+        debug!("Loading global cache data");
         let global = CacheData::new(config.global_path())?;
+
         let local = match config.local_path() {
-            Some(path) => Some(CacheData::new(path)?),
+            Some(path) => {
+                debug!("Loading local cache data");
+                Some(CacheData::new(path)?)
+            }
             None => None,
         };
 
@@ -123,9 +128,17 @@ impl Cache {
         };
 
         let file = path.join(format!("{}.toml", &repository.name));
-        util::write_content(file, |f| {
-            let ser = toml::to_string_pretty(&repository)?;
-            f.write_fmt(format_args!("{}", ser)).map_err(Into::into)
+        debug!("Writing repository to: {:#?}", file);
+
+        util::write_content(&file, |f| {
+            let ser = toml::to_string_pretty(&repository).context(format!(
+                "failed to serialize repository to file\n\n{:#?}",
+                repository
+            ))?;
+
+            f.write_fmt(format_args!("{}", ser))
+                .context(format!("failed to write file: {:#?}", file))
+                .map_err(Into::into)
         })
     }
 
@@ -139,62 +152,83 @@ impl Cache {
         };
 
         let file = path.join(format!("{}.toml", &tag.name));
-        util::write_content(file, |f| {
-            let ser = toml::to_string_pretty(&tag)?;
-            f.write_fmt(format_args!("{}", ser)).map_err(Into::into)
+        util::write_content(&file, |f| {
+            let ser = toml::to_string_pretty(&tag)
+                .context(format!("failed to serialize tag to file\n\n{:#?}", tag))?;
+
+            f.write_fmt(format_args!("{}", ser))
+                .context(format!("failed to write file: {:#?}", file))
+                .map_err(Into::into)
         })
     }
 }
 
 impl CacheData {
-    pub fn new<P: AsRef<Path>>(path: P) -> Result<Self> {
+    pub fn new<P>(path: P) -> Result<Self>
+    where
+        P: AsRef<Path> + std::fmt::Debug,
+    {
         let repo_path = PathBuf::from(path.as_ref()).join("repository");
+        debug!("Checking if repository folder exists: {:#?}", repo_path);
+
         let repositories: HashMap<String, Repository> = if repo_path.is_dir() {
+            debug!("Repository folder exists");
             let mut map = HashMap::new();
             let pattern = format!("{}/*.toml", repo_path.display());
 
             for entry in glob::glob(&pattern).expect("failed repository glob") {
                 let file = match entry {
                     Ok(file) => file,
-                    Err(_) => {
-                        // TODO: Handle this is some way. Display this failure to the user.
-                        // or should we panic instead?
-                        continue;
+                    Err(e) => {
+                        return Err(e).context("file is unreadable");
                     }
                 };
 
-                let content = std::fs::read_to_string(file)?;
-                let repository: Repository = toml::from_str(&content)?;
+                debug!("Loading Repository: {:#?}", file);
+                let content = util::read_content(&file)?;
+                let repository: Repository = toml::from_str(&content).context(format!(
+                    "could not serialize content into Repository:\n\n{}",
+                    content
+                ))?;
 
+                debug!("Inserting into cache: {}", repository.name);
                 map.insert(repository.name.to_owned(), repository);
             }
             map
         } else {
+            debug!("Repository folder does not exists");
             HashMap::new()
         };
 
         let tag_path = PathBuf::from(path.as_ref()).join("tag");
+        debug!("Checking if tag folder exists: {:#?}", tag_path);
+
         let tags: HashMap<String, Tag> = if tag_path.is_dir() {
+            debug!("Tag folder exists");
             let mut map = HashMap::new();
             let pattern = format!("{}/*.toml", tag_path.display());
 
             for entry in glob::glob(&pattern).expect("failed tag glob") {
                 let file = match entry {
                     Ok(file) => file,
-                    Err(_) => {
-                        // TODO: Handle this is some way. Display this failure to the user.
-                        // or should we panic instead?
-                        continue;
+                    Err(e) => {
+                        return Err(e).context("file is unreadable");
                     }
                 };
 
-                let content = std::fs::read_to_string(file)?;
-                let tag: Tag = toml::from_str(&content)?;
+                debug!("Loading Tag: {:#?}", file);
+                let content = util::read_content(&file)?;
+                let tag: Tag = toml::from_str(&content).context(format!(
+                    "could not serialize content into Tag:\n\n{}",
+                    content
+                ))?;
 
+                debug!("Inserting into cache: {}", tag.name);
                 map.insert(tag.name.to_owned(), tag);
             }
             map
         } else {
+            debug!("Tag folder does not exists");
             HashMap::new()
         };
 

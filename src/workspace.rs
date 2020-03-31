@@ -1,6 +1,7 @@
 use crate::{Cache, Config, Location};
 use anyhow::Result;
 
+#[derive(Debug)]
 pub struct Workspace {
     config: Config,
     cache: Cache,
