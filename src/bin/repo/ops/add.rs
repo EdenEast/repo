@@ -52,11 +52,16 @@ impl CliCommand for AddCommand {
     fn run(self) -> Result<()> {
         let mut workspace = Workspace::new()?;
 
-        let name = self
-            .name
-            .unwrap_or(self.url.clone().trim_end_matches(".git").to_owned());
+        let name = self.name.as_deref().unwrap_or_else(|| {
+            self.url
+                .rsplit('/')
+                .next()
+                .map(|s| s.trim_end_matches(".git"))
+                .unwrap()
+        });
 
         debug!("Name of new repo is: {}", name);
+        debug!("Url of new repo is: {}", self.url);
 
         let repo = RepositoryBuilder::new(&name)
             .remote(Remote::from_query("origin", Query::from_str(&self.url)?)?)
