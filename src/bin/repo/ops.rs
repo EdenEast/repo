@@ -26,6 +26,7 @@ macro_rules! define_app {
 define_app! {
     "add" => [self::add::AddCommand: &[]],
     "remove" => [self::remove::RemoveCommand: &[]],
+    "list" => [self::list::ListCommand: &[]],
 }
 
 pub trait CliCommand {
@@ -35,4 +36,5 @@ pub trait CliCommand {
 }
 
 mod add;
+mod list;
 mod remove;

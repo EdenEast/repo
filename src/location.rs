@@ -1,5 +1,5 @@
 /// Enum to state between a global config/cache location
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 pub enum Location {
     Global,
     Local,
