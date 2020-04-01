@@ -1,4 +1,4 @@
-use crate::{Remote, Tag};
+use crate::{Config, Location, Remote, Tag};
 use anyhow::Result;
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
@@ -8,12 +8,19 @@ pub struct Repository {
     pub name: String,
     pub tags: Vec<String>,
     pub remotes: Vec<Remote>,
+
+    #[serde(skip)]
+    pub config: PathBuf,
+
+    #[serde(skip)]
+    pub location: Location,
 }
 
 pub struct RepositoryBuilder {
     name: String,
     remotes: Vec<Remote>,
     tags: Vec<String>,
+    location: Location,
 }
 
 impl RepositoryBuilder {
@@ -22,6 +29,7 @@ impl RepositoryBuilder {
             name: name.to_owned(),
             remotes: Vec::new(),
             tags: Vec::new(),
+            location: Location::default(),
         }
     }
 
@@ -35,11 +43,24 @@ impl RepositoryBuilder {
         self
     }
 
+    pub fn location(mut self, location: Location) -> Self {
+        self.location = location;
+        self
+    }
+
     pub fn build(self) -> Repository {
+        let config = match self.location {
+            Location::Global => Config::global_path(),
+            Location::Local => Config::local_path(),
+        };
+
+        let config = config.join(format!("{}.toml", self.name));
         Repository {
             name: self.name,
             remotes: self.remotes,
             tags: self.tags,
+            location: self.location,
+            config,
         }
     }
 }
