@@ -7,6 +7,7 @@ use std::str::FromStr;
 pub struct AddCommand {
     url: String,
     name: Option<String>,
+    local: bool,
 }
 
 impl CliCommand for AddCommand {
@@ -17,7 +18,7 @@ impl CliCommand for AddCommand {
                     .help("A url link to the repository's remote origin.")
                     .long_help(
                         "A url link to the repository's remote origin.\n\
-                    Url can be represented by the following specifications:\n\n  \
+                        Url can be represented by the following specifications:\n\n  \
                         * <scheme>://[<username>[:<password>]@]<host>/<path-to-repo>.git\n    \
                         - Available schemes are: `http[s]`, `ssh` and `git`.\n    \
                         - Example: https://github.com/user/repo\n\n  \
@@ -28,6 +29,13 @@ impl CliCommand for AddCommand {
                     .required(true),
             )
             .arg(Arg::with_name("NAME").help("Name of the repository"))
+            .arg(
+                Arg::with_name("local")
+                    .help("Write repository to local cache")
+                    .long_help("Write repository to local cache. Local cache is defined by $REPO_LOCAL_PATH")
+                    .long("local")
+                    .short("l")
+            )
     }
 
     fn from_matches(m: &ArgMatches) -> Self {
@@ -37,6 +45,7 @@ impl CliCommand for AddCommand {
                 .map(String::from)
                 .expect("URL is a required argument"),
             name: m.value_of("NAME").map(String::from),
+            local: m.is_present("local"),
         }
     }
 
@@ -45,15 +54,22 @@ impl CliCommand for AddCommand {
 
         let name = self
             .name
-            .as_ref()
-            .map(|s| s.trim_end_matches(".git"))
-            .map(String::from)
-            .unwrap();
+            .unwrap_or(self.url.clone().trim_end_matches(".git").to_owned());
+
+        debug!("Name of new repo is: {}", name);
 
         let repo = RepositoryBuilder::new(&name)
             .remote(Remote::from_query("origin", Query::from_str(&self.url)?)?)
             .build();
 
-        workspace.add_repository(repo, Location::Global)
+        let location = if self.local {
+            Location::Local
+        } else {
+            Location::Global
+        };
+
+        debug!("Location is: {:?}", location);
+
+        workspace.add_repository(repo, location)
     }
 }
