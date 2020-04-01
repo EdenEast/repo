@@ -1,4 +1,4 @@
-use crate::util;
+use crate::{util, Location};
 use anyhow::{anyhow, Context, Result};
 use lazy_static::lazy_static;
 use serde::{Deserialize, Serialize};
@@ -58,7 +58,7 @@ struct RawConfigData {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ConfigData {
-    root: PathBuf,
+    root: Option<PathBuf>,
     use_cli: bool,
     host: String,
     include: Vec<String>,
@@ -69,16 +69,26 @@ pub struct ConfigData {
 #[derive(Debug)]
 pub struct Config {
     global_data: ConfigData,
-    local_data: Option<ConfigData>,
+    local_data: ConfigData,
 }
 
 impl ConfigData {
+    fn new(location: Location) -> Self {
+        Self {
+            root: None,
+            use_cli: false,
+            host: String::from("github.com"),
+            include: Vec::new(),
+            exclude: Vec::new(),
+            path: match location {
+                Location::Global => (&*GLOBAL_CONFIG_PATH.clone()).to_path_buf(),
+                Location::Local => (&*LOCAL_CONFIG_PATH.clone()).to_path_buf(),
+            },
+        }
+    }
+
     fn from_raw(raw: RawConfigData) -> Result<Self> {
-        let root = raw
-            .root
-            .as_ref()
-            .and_then(|path| util::make_path_buf(path).ok())
-            .unwrap_or_else(|| (&*DEFAULT_ROOT.clone()).to_path_buf());
+        let root = raw.root.and_then(|path| util::make_path_buf(path).ok());
 
         let use_cli = raw.use_cli.unwrap_or_default();
         let default_host = raw.default_host.as_deref().unwrap_or("github.com");
@@ -119,19 +129,6 @@ impl TryFrom<RawConfigData> for ConfigData {
     }
 }
 
-impl Default for ConfigData {
-    fn default() -> Self {
-        Self {
-            root: util::make_path_buf("~/repo").unwrap(),
-            use_cli: false,
-            host: "github.com".to_owned(),
-            include: Vec::new(),
-            exclude: Vec::new(),
-            path: (&*GLOBAL_CONFIG_PATH.clone()).to_path_buf(),
-        }
-    }
-}
-
 impl Config {
     pub fn new() -> Result<Self> {
         let global_path: &Path = &*GLOBAL_CONFIG_PATH;
@@ -143,19 +140,19 @@ impl Config {
             ConfigData::from_path(global_file)?
         } else {
             debug!("Failed to find file: {:#?}", global_file);
-            ConfigData::default()
+            ConfigData::new(Location::Global)
         };
 
         let local_path: &Path = &*LOCAL_CONFIG_PATH;
         let local_file = local_path.join("config.toml");
 
         debug!("Looking for local config file: {:#?}", local_file);
-        let local_config: Option<ConfigData> = if local_file.is_file() {
+        let local_config = if local_file.is_file() {
             debug!("Found file: {:#?}", local_file);
-            Some(ConfigData::from_path(local_file)?)
+            ConfigData::from_path(local_file)?
         } else {
             debug!("Failed to find file: {:#?}", local_file);
-            None
+            ConfigData::new(Location::Local)
         };
 
         Ok(Self {
@@ -168,7 +165,7 @@ impl Config {
         self.global_data.path.as_path()
     }
 
-    pub fn local_path(&self) -> Option<&Path> {
-        self.local_data.as_ref().map(|data| data.path.as_path())
+    pub fn local_path(&self) -> &Path {
+        self.local_data.path.as_path()
     }
 }

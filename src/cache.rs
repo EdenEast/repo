@@ -9,7 +9,7 @@ use std::{
 #[derive(Debug)]
 pub struct Cache {
     global: CacheData,
-    local: Option<CacheData>,
+    local: CacheData,
 }
 
 #[derive(Debug)]
@@ -22,14 +22,7 @@ impl Cache {
     pub fn new(config: &Config) -> Result<Self> {
         debug!("Loading global cache data");
         let global = CacheData::new(config.global_path())?;
-
-        let local = match config.local_path() {
-            Some(path) => {
-                debug!("Loading local cache data");
-                Some(CacheData::new(path)?)
-            }
-            None => None,
-        };
+        let local = CacheData::new(config.local_path())?;
 
         Ok(Self { global, local })
     }
@@ -41,9 +34,7 @@ impl Cache {
                 self.global.repositories.insert(name, repository);
             }
             Location::Local => {
-                if let Some(local) = &mut self.local {
-                    local.repositories.insert(name, repository);
-                }
+                self.local.repositories.insert(name, repository);
             }
         };
     }
@@ -55,29 +46,23 @@ impl Cache {
                 self.global.tags.insert(name, tag);
             }
             Location::Local => {
-                if let Some(local) = &mut self.local {
-                    local.tags.insert(name, tag);
-                }
+                self.local.tags.insert(name, tag);
             }
         };
     }
 
     /// Check if cache contains a repository with the name as a key
     pub fn has_repository(&self, name: &str) -> bool {
-        if let Some(local) = self.local.as_ref() {
-            if local.repositories.contains_key(name) {
-                return true;
-            }
+        if self.local.repositories.contains_key(name) {
+            return true;
         }
 
         self.global.repositories.contains_key(name)
     }
 
     pub fn has_tag(&self, name: &str) -> bool {
-        if let Some(local) = self.local.as_ref() {
-            if local.tags.contains_key(name) {
-                return true;
-            }
+        if self.local.tags.contains_key(name) {
+            return true;
         }
 
         self.global.tags.contains_key(name)
