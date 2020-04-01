@@ -65,11 +65,7 @@ impl Workspace {
     fn write_repository(&self, repository: &Repository, location: &Location) -> Result<()> {
         let path = match location {
             Location::Global => self.config.global_path().join("repository"),
-            Location::Local => self
-                .config
-                .local_path()
-                .map(|path| path.join("repository"))
-                .expect("Local location specified but local configuration not found"),
+            Location::Local => self.config.local_path().join("repository"),
         };
 
         let file = path.join(format!("{}.toml", &repository.name));
@@ -90,11 +86,7 @@ impl Workspace {
     fn write_tag(&self, tag: &Tag, location: &Location) -> Result<()> {
         let path = match location {
             Location::Global => self.config.global_path().join("tag"),
-            Location::Local => self
-                .config
-                .local_path()
-                .map(|path| path.join("tag"))
-                .expect("Local location specified but location configuration not found"),
+            Location::Local => self.config.local_path().join("tag"),
         };
 
         let file = path.join(format!("{}.toml", &tag.name));
