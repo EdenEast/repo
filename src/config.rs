@@ -37,6 +37,11 @@ lazy_static! {
                 })
         }
     };
+    pub static ref DEFAULT_ROOT: PathBuf = dirs::home_dir()
+        .map(|path| path.join("repo"))
+        .unwrap_or_else(|| {
+            util::make_path_buf("~/repo").expect("failed to determine default root directory")
+        });
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -69,8 +74,11 @@ pub struct Config {
 
 impl ConfigData {
     fn from_raw(raw: RawConfigData) -> Result<Self> {
-        let root_dir = raw.root.as_deref().unwrap_or("~/repo");
-        let root = util::make_path_buf(root_dir)?;
+        let root = raw
+            .root
+            .as_ref()
+            .and_then(|path| util::make_path_buf(path).ok())
+            .unwrap_or_else(|| (&*DEFAULT_ROOT.clone()).to_path_buf());
 
         let use_cli = raw.use_cli.unwrap_or_default();
         let default_host = raw.default_host.as_deref().unwrap_or("github.com");
