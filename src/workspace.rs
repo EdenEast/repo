@@ -11,7 +11,7 @@ pub struct Workspace {
 impl Workspace {
     pub fn new() -> Result<Self> {
         let config = Config::new()?;
-        let cache = Cache::new(&config)?;
+        let cache = Cache::new()?;
 
         Ok(Self { config, cache })
     }
@@ -34,7 +34,7 @@ impl Workspace {
             ));
         }
 
-        self.write_repository(&repository, &location)?;
+        self.write_repository(&repository, location)?;
         self.cache.add_repository(repository, location);
 
         Ok(())
@@ -48,10 +48,14 @@ impl Workspace {
             return Err(anyhow!("Tag: {} already exist in repo", tag.name));
         }
 
-        self.write_tag(&tag, &location)?;
+        self.write_tag(&tag, location)?;
         self.cache.add_tag(tag, location);
 
         Ok(())
+    }
+
+    pub fn get_repository(&self, name: &str) -> Option<&Repository> {
+        self.cache.get_repository(&name)
     }
 
     pub fn has_repository(&self, name: &str) -> bool {
@@ -62,10 +66,15 @@ impl Workspace {
         self.cache.has_tag(&name)
     }
 
-    fn write_repository(&self, repository: &Repository, location: &Location) -> Result<()> {
+    pub fn remove_repository(&mut self, name: &str) -> Result<()> {
+        debug!("Removing repository: '{}' from cache", name);
+        self.cache.remove_repository(&name)
+    }
+
+    fn write_repository(&self, repository: &Repository, location: Location) -> Result<()> {
         let path = match location {
-            Location::Global => self.config.global_path().join("repository"),
-            Location::Local => self.config.local_path().join("repository"),
+            Location::Global => Config::global_path().join("repository"),
+            Location::Local => Config::local_path().join("repository"),
         };
 
         let file = path.join(format!("{}.toml", &repository.name));
@@ -83,10 +92,10 @@ impl Workspace {
         })
     }
 
-    fn write_tag(&self, tag: &Tag, location: &Location) -> Result<()> {
+    fn write_tag(&self, tag: &Tag, location: Location) -> Result<()> {
         let path = match location {
-            Location::Global => self.config.global_path().join("tag"),
-            Location::Local => self.config.local_path().join("tag"),
+            Location::Global => Config::global_path().join("tag"),
+            Location::Local => Config::local_path().join("tag"),
         };
 
         let file = path.join(format!("{}.toml", &tag.name));

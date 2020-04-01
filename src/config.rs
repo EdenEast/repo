@@ -161,11 +161,11 @@ impl Config {
         })
     }
 
-    pub fn global_path(&self) -> &Path {
-        self.global_data.path.as_path()
+    pub fn global_path() -> &'static Path {
+        &*GLOBAL_CONFIG_PATH
     }
 
-    pub fn local_path(&self) -> &Path {
-        self.local_data.path.as_path()
+    pub fn local_path() -> &'static Path {
+        &*LOCAL_CONFIG_PATH
     }
 }
