@@ -35,7 +35,7 @@ impl Workspace {
         }
 
         self.write_repository(&repository, location)?;
-        self.cache.add_repository(repository, location);
+        self.cache.add_repository(repository);
 
         Ok(())
     }
@@ -49,7 +49,7 @@ impl Workspace {
         }
 
         self.write_tag(&tag, location)?;
-        self.cache.add_tag(tag, location);
+        self.cache.add_tag(tag);
 
         Ok(())
     }
