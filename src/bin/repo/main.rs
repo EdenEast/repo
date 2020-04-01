@@ -1,3 +1,6 @@
+#[macro_use]
+extern crate log;
+
 use anyhow::Result;
 
 fn main() -> Result<()> {
