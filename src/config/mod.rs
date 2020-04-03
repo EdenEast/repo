@@ -30,5 +30,5 @@ struct RawConfigData {
     path: PathBuf,
 }
 
-mod config;
 mod data;
+mod inner;
