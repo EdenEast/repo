@@ -1,4 +1,4 @@
-use crate::{util, Config, Location, Repository, Tag};
+use crate::{config::Config, util, Location, Repository, Tag};
 use anyhow::{anyhow, Context, Result};
 use std::{
     collections::HashSet,

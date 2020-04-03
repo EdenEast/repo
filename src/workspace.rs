@@ -1,4 +1,4 @@
-use crate::{util, Cache, Config, Location, Repository, Tag};
+use crate::{config::Config, util, Cache, Location, Repository, Tag};
 use anyhow::{anyhow, Context, Result};
 use std::{collections::HashMap, io::Write};
 
@@ -22,6 +22,10 @@ impl Workspace {
 
     pub fn config(&self) -> &Config {
         &self.config
+    }
+
+    pub fn config_mut(&mut self) -> &mut Config {
+        &mut self.config
     }
 
     /// Adds a repository to the cache
