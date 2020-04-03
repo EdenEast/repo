@@ -156,4 +156,54 @@ impl Config {
             self.default.host.as_ref().unwrap()
         }
     }
+
+    pub fn include_tags(&self, location: Option<Location>) -> Vec<&str> {
+        if let Some(l) = location {
+            let result = match l {
+                Location::Global => self.global.include.as_ref(),
+                Location::Local => self.local.exclude.as_ref(),
+            };
+
+            if let Some(list) = result {
+                return list.iter().map(AsRef::as_ref).collect();
+            }
+        }
+
+        let mut result: Vec<&str> = Vec::new();
+
+        if let Some(local) = self.local.include.as_ref() {
+            let mut list = local.iter().map(AsRef::as_ref).collect::<Vec<&str>>();
+            result.append(&mut list);
+        } else if let Some(global) = self.global.include.as_ref() {
+            let mut list = global.iter().map(AsRef::as_ref).collect::<Vec<&str>>();
+            result.append(&mut list);
+        }
+
+        result
+    }
+
+    pub fn exclude_tags(&self, location: Option<Location>) -> Vec<&str> {
+        if let Some(l) = location {
+            let result = match l {
+                Location::Global => self.global.exclude.as_ref(),
+                Location::Local => self.local.exclude.as_ref(),
+            };
+
+            if let Some(list) = result {
+                return list.iter().map(AsRef::as_ref).collect();
+            }
+        }
+
+        let mut result: Vec<&str> = Vec::new();
+
+        if let Some(local) = self.local.exclude.as_ref() {
+            let mut list = local.iter().map(AsRef::as_ref).collect::<Vec<&str>>();
+            result.append(&mut list);
+        } else if let Some(global) = self.global.exclude.as_ref() {
+            let mut list = global.iter().map(AsRef::as_ref).collect::<Vec<&str>>();
+            result.append(&mut list);
+        }
+
+        result
+    }
 }

@@ -35,15 +35,12 @@ impl ConfigData {
     fn from_raw(raw: RawConfigData) -> Result<Self> {
         let root = raw.root.and_then(|path| util::make_path_buf(path).ok());
 
-        let include_tags = raw.include.unwrap_or_default();
-        let exclude_tags = raw.exclude.unwrap_or_default();
-
         Ok(Self {
             root,
             cli: raw.cli,
             host: raw.default_host,
-            include: Some(include_tags),
-            exclude: Some(exclude_tags),
+            include: raw.include,
+            exclude: raw.exclude,
             path: Some(raw.path),
         })
     }
