@@ -97,12 +97,12 @@ impl Config {
                     .global
                     .root
                     .as_ref()
-                    .unwrap_or(self.default.root.as_ref().unwrap()),
+                    .unwrap_or_else(|| self.default.root.as_ref().unwrap()),
                 Location::Local => self
                     .local
                     .root
                     .as_ref()
-                    .unwrap_or(self.default.root.as_ref().unwrap()),
+                    .unwrap_or_else(|| self.default.root.as_ref().unwrap()),
             };
 
             return path;

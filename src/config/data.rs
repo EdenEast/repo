@@ -21,7 +21,7 @@ lazy_static! {
 impl Default for ConfigData {
     fn default() -> Self {
         Self {
-            root: Some((*DEFAULT_ROOT.clone()).to_path_buf()),
+            root: Some((*DEFAULT_ROOT).to_path_buf()),
             cli: Some(false),
             host: Some("github.com".to_owned()),
             include: None,
