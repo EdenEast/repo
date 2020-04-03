@@ -5,7 +5,6 @@
 extern crate log;
 
 pub use cache::Cache;
-pub use config::Config;
 pub use location::Location;
 pub use query::Query;
 pub use remote::Remote;

@@ -1,4 +1,4 @@
-use crate::{Config, Location, Remote, Tag};
+use crate::{config::Config, Location, Remote, Tag};
 use anyhow::Result;
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
