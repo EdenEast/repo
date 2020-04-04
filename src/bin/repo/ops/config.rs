@@ -9,6 +9,7 @@ pub struct ConfigCommand {
     value: Option<String>,
     local: bool,
     global: bool,
+    remove: bool,
 }
 
 impl CliCommand for ConfigCommand {
@@ -33,6 +34,13 @@ impl CliCommand for ConfigCommand {
                     .short("g")
                     .conflicts_with("local"),
             )
+            .arg(
+                Arg::with_name("remove")
+                    .help("Remove tag instead of adding")
+                    .long_help("Remove tag from 'include' or 'exclude' list")
+                    .long("rm")
+                    .short("r"),
+            )
     }
 
     fn from_matches(m: &ArgMatches) -> Self {
@@ -41,6 +49,7 @@ impl CliCommand for ConfigCommand {
             value: m.value_of("VALUE").map(String::from),
             local: m.is_present("local"),
             global: m.is_present("global"),
+            remove: m.is_present("remove"),
         }
     }
 
@@ -114,12 +123,36 @@ impl ConfigCommand {
             "cli" => config.set_cli(value.parse()?, location),
             "host" => config.set_host(value, location),
             "include" => {
-                config.add_include_tag(value, location);
+                if self.remove {
+                    if !config.remove_include_tag(value, location) {
+                        eprintln!("Tag '{}' does not exists", value);
+                        std::process::exit(1);
+                    }
+                } else {
+                    if config.include_tags(None).contains(&name) {
+                        eprintln!("Tag '{}' already exists", value);
+                        std::process::exit(1);
+                    }
+                    config.add_include_tag(value, location);
+                }
             }
             "exclude" => {
-                config.add_exclude_tag(value, location);
+                if self.remove {
+                    if !config.remove_exclude_tag(value, location) {
+                        eprintln!("Tag '{}' does not exists in {:#?} config", value, location)
+                        std::process::exit(1);
+                    }
+                } else {
+                    if config.add_exclude_tag(value, location) {
+                        eprintln!("Tag '{}' already exists", value);
+                        std::process::exit(1);
+                    }
+                }
             }
-            _ => {}
+            _ => {
+                eprintln!("Unknown configuration option: '{}'", name);
+                std::process::exit(1);
+            }
         };
 
         config.write(location)

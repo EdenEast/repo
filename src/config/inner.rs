@@ -187,9 +187,6 @@ impl Config {
                 .collect::<Vec<&str>>(),
         );
 
-        println!("{:#?}", self.global);
-        println!("{:#?}", self.local);
-
         result
     }
 
@@ -221,9 +218,6 @@ impl Config {
                 .map(AsRef::as_ref)
                 .collect::<Vec<&str>>(),
         );
-
-        println!("{:#?}", self.global);
-        println!("{:#?}", self.local);
 
         result
     }
