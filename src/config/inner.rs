@@ -6,10 +6,11 @@ use anyhow::{anyhow, Context, Result};
 use lazy_static::lazy_static;
 use serde::{Deserialize, Serialize};
 use std::{
+    collections::HashSet,
     convert::{TryFrom, TryInto},
     env,
     fs::File,
-    io::Read,
+    io::{Read, Write},
     path::{Path, PathBuf},
 };
 
@@ -159,51 +160,170 @@ impl Config {
 
     pub fn include_tags(&self, location: Option<Location>) -> Vec<&str> {
         if let Some(l) = location {
-            let result = match l {
-                Location::Global => self.global.include.as_ref(),
-                Location::Local => self.local.exclude.as_ref(),
+            let list = match l {
+                Location::Global => &self.global.include,
+                Location::Local => &self.local.include,
             };
 
-            if let Some(list) = result {
-                return list.iter().map(AsRef::as_ref).collect();
-            }
+            return list.iter().map(AsRef::as_ref).collect();
         }
 
         let mut result: Vec<&str> = Vec::new();
+        result.extend(
+            &self
+                .local
+                .include
+                .iter()
+                .map(AsRef::as_ref)
+                .collect::<Vec<&str>>(),
+        );
 
-        if let Some(local) = self.local.include.as_ref() {
-            let mut list = local.iter().map(AsRef::as_ref).collect::<Vec<&str>>();
-            result.append(&mut list);
-        } else if let Some(global) = self.global.include.as_ref() {
-            let mut list = global.iter().map(AsRef::as_ref).collect::<Vec<&str>>();
-            result.append(&mut list);
-        }
+        result.extend(
+            &self
+                .global
+                .include
+                .iter()
+                .map(AsRef::as_ref)
+                .collect::<Vec<&str>>(),
+        );
+
+        println!("{:#?}", self.global);
+        println!("{:#?}", self.local);
 
         result
     }
 
     pub fn exclude_tags(&self, location: Option<Location>) -> Vec<&str> {
         if let Some(l) = location {
-            let result = match l {
-                Location::Global => self.global.exclude.as_ref(),
-                Location::Local => self.local.exclude.as_ref(),
+            let list = match l {
+                Location::Global => &self.global.exclude,
+                Location::Local => &self.local.exclude,
             };
 
-            if let Some(list) = result {
-                return list.iter().map(AsRef::as_ref).collect();
-            }
+            return list.iter().map(AsRef::as_ref).collect();
         }
 
         let mut result: Vec<&str> = Vec::new();
+        result.extend(
+            &self
+                .local
+                .exclude
+                .iter()
+                .map(AsRef::as_ref)
+                .collect::<Vec<&str>>(),
+        );
 
-        if let Some(local) = self.local.exclude.as_ref() {
-            let mut list = local.iter().map(AsRef::as_ref).collect::<Vec<&str>>();
-            result.append(&mut list);
-        } else if let Some(global) = self.global.exclude.as_ref() {
-            let mut list = global.iter().map(AsRef::as_ref).collect::<Vec<&str>>();
-            result.append(&mut list);
-        }
+        result.extend(
+            &self
+                .global
+                .exclude
+                .iter()
+                .map(AsRef::as_ref)
+                .collect::<Vec<&str>>(),
+        );
+
+        println!("{:#?}", self.global);
+        println!("{:#?}", self.local);
 
         result
+    }
+
+    // --------------------------------------------------------------------------------------------
+    // Set functions for config command
+
+    pub fn set_root(&mut self, path: PathBuf, location: Option<Location>) {
+        if let Some(l) = location {
+            if l == Location::Local {
+                self.local.root = Some(path);
+                return;
+            }
+        }
+
+        self.global.root = Some(path);
+    }
+
+    pub fn set_cli(&mut self, value: bool, location: Option<Location>) {
+        if let Some(l) = location {
+            if l == Location::Local {
+                self.local.cli = Some(value);
+                return;
+            }
+        }
+
+        self.global.cli = Some(value);
+    }
+
+    pub fn set_host(&mut self, host: &str, location: Option<Location>) {
+        if let Some(l) = location {
+            if l == Location::Local {
+                self.local.host = Some(host.to_owned());
+                return;
+            }
+        }
+
+        self.global.host = Some(host.to_owned());
+    }
+
+    pub fn add_include_tag(&mut self, tag: &str, location: Option<Location>) -> bool {
+        if let Some(l) = location {
+            if l == Location::Local {
+                return self.local.include.insert(tag.to_owned());
+            }
+        }
+
+        self.global.include.insert(tag.to_owned())
+    }
+
+    pub fn remove_include_tag(&mut self, tag: &str, location: Option<Location>) -> bool {
+        if let Some(l) = location {
+            if l == Location::Local {
+                return self.local.include.remove(tag);
+            }
+        }
+
+        self.global.include.remove(tag)
+    }
+
+    pub fn add_exclude_tag(&mut self, tag: &str, location: Option<Location>) -> bool {
+        if let Some(l) = location {
+            if l == Location::Local {
+                return self.local.exclude.insert(tag.to_owned());
+            }
+        }
+
+        self.global.exclude.insert(tag.to_owned())
+    }
+
+    pub fn remove_exclude_tag(&mut self, tag: &str, location: Option<Location>) -> bool {
+        if let Some(l) = location {
+            if l == Location::Local {
+                return self.local.exclude.remove(tag);
+            }
+        }
+
+        self.global.exclude.remove(tag)
+    }
+
+    pub fn write(&self, location: Option<Location>) -> Result<()> {
+        let data = match location {
+            Some(l) => match l {
+                Location::Global => &self.global,
+                Location::Local => &self.local,
+            },
+            None => &self.global,
+        };
+
+        let path = data.path.as_ref().unwrap();
+        let file = path.join("config.toml");
+
+        debug!("Writing config to disk: {}", path.display());
+        util::write_content(&file, |f| {
+            let ser = toml::to_string_pretty(data)
+                .context(format!("failed to serialize config to file\n\n{:#?}", file))?;
+
+            f.write_fmt(format_args!("{}", ser))
+                .context(format!("failed to write file: {:#?}", file))
+                .map_err(Into::into)
+        })
     }
 }

@@ -2,6 +2,7 @@ use super::CliCommand;
 use anyhow::Result;
 use clap::{App, Arg, ArgMatches, SubCommand};
 use repo::prelude::*;
+use std::{path::PathBuf, str::FromStr};
 
 pub struct ConfigCommand {
     name: Option<String>,
@@ -39,7 +40,7 @@ impl CliCommand for ConfigCommand {
             name: m.value_of("NAME").map(String::from),
             value: m.value_of("VALUE").map(String::from),
             local: m.is_present("local"),
-            global: m.is_present("local"),
+            global: m.is_present("global"),
         }
     }
 
@@ -101,7 +102,26 @@ impl ConfigCommand {
         Ok(())
     }
 
-    fn set_value(&self, _name: &str, _value: &str, _config: &mut Config) -> Result<()> {
-        Ok(())
+    fn set_value(&self, name: &str, value: &str, config: &mut Config) -> Result<()> {
+        let location = match (self.local, self.global) {
+            (true, false) => Some(Location::Local),
+            (false, true) => Some(Location::Global),
+            _ => None,
+        };
+
+        match name {
+            "root" => config.set_root(PathBuf::from_str(value)?, location),
+            "cli" => config.set_cli(value.parse()?, location),
+            "host" => config.set_host(value, location),
+            "include" => {
+                config.add_include_tag(value, location);
+            }
+            "exclude" => {
+                config.add_exclude_tag(value, location);
+            }
+            _ => {}
+        };
+
+        config.write(location)
     }
 }
