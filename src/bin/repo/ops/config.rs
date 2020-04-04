@@ -128,25 +128,21 @@ impl ConfigCommand {
                         eprintln!("Tag '{}' does not exists", value);
                         std::process::exit(1);
                     }
-                } else {
-                    if config.include_tags(None).contains(&name) {
-                        eprintln!("Tag '{}' already exists", value);
-                        std::process::exit(1);
-                    }
-                    config.add_include_tag(value, location);
+                } else if config.include_tags(None).contains(&name) {
+                    eprintln!("Tag '{}' already exists", value);
+                    std::process::exit(1);
                 }
+                config.add_include_tag(value, location);
             }
             "exclude" => {
                 if self.remove {
                     if !config.remove_exclude_tag(value, location) {
-                        eprintln!("Tag '{}' does not exists in {:#?} config", value, location)
+                        eprintln!("Tag '{}' does not exists in {:#?} config", value, location);
                         std::process::exit(1);
                     }
-                } else {
-                    if config.add_exclude_tag(value, location) {
-                        eprintln!("Tag '{}' already exists", value);
-                        std::process::exit(1);
-                    }
+                } else if config.add_exclude_tag(value, location) {
+                    eprintln!("Tag '{}' already exists", value);
+                    std::process::exit(1);
                 }
             }
             _ => {
