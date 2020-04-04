@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use std::path::PathBuf;
+use std::{collections::HashSet, path::PathBuf};
 
 #[derive(Debug)]
 pub struct Config {
@@ -13,8 +13,8 @@ pub struct ConfigData {
     root: Option<PathBuf>,
     cli: Option<bool>,
     host: Option<String>,
-    include: Option<Vec<String>>,
-    exclude: Option<Vec<String>>,
+    include: HashSet<String>,
+    exclude: HashSet<String>,
     path: Option<PathBuf>,
 }
 
@@ -23,8 +23,8 @@ struct RawConfigData {
     root: Option<String>,
     cli: Option<bool>,
     default_host: Option<String>,
-    include: Option<Vec<String>>,
-    exclude: Option<Vec<String>>,
+    include: Option<HashSet<String>>,
+    exclude: Option<HashSet<String>>,
 
     #[serde(skip)]
     path: PathBuf,

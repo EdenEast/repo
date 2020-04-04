@@ -6,6 +6,7 @@ use anyhow::{Context, Result};
 use lazy_static::lazy_static;
 use serde::{Deserialize, Serialize};
 use std::{
+    collections::HashSet,
     convert::{TryFrom, TryInto},
     path::{Path, PathBuf},
 };
@@ -24,8 +25,8 @@ impl Default for ConfigData {
             root: Some((*DEFAULT_ROOT).to_path_buf()),
             cli: Some(false),
             host: Some("github.com".to_owned()),
-            include: None,
-            exclude: None,
+            include: HashSet::new(),
+            exclude: HashSet::new(),
             path: None,
         }
     }
@@ -39,8 +40,8 @@ impl ConfigData {
             root,
             cli: raw.cli,
             host: raw.default_host,
-            include: raw.include,
-            exclude: raw.exclude,
+            include: raw.include.unwrap_or_default(),
+            exclude: raw.exclude.unwrap_or_default(),
             path: Some(raw.path),
         })
     }
