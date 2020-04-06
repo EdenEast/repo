@@ -25,7 +25,7 @@ impl CliCommand for RemoveCommand {
         }
     }
 
-    fn run(self) -> Result<()> {
+    fn run(self, _: &ArgMatches) -> Result<()> {
         let mut workspace = Workspace::new()?;
 
         for name in self.names {

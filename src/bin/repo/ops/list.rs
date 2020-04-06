@@ -32,7 +32,7 @@ impl CliCommand for ListCommand {
         }
     }
 
-    fn run(self) -> Result<()> {
+    fn run(self, _: &ArgMatches) -> Result<()> {
         let workspace = Workspace::new()?;
 
         let repositories = match (self.global, self.local) {

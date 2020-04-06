@@ -49,7 +49,7 @@ impl CliCommand for AddCommand {
         }
     }
 
-    fn run(self) -> Result<()> {
+    fn run(self, _: &ArgMatches) -> Result<()> {
         let mut workspace = Workspace::new()?;
 
         let name = self.name.as_deref().unwrap_or_else(|| {
