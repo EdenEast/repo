@@ -62,6 +62,18 @@ impl Cache {
         }
     }
 
+    pub fn remove_tag(&mut self, name: &str) -> Result<()> {
+        match self.get_tag(name) {
+            Some(tag) => std::fs::remove_file(&tag.config)
+                .context(format!(
+                    "failed to remove tag config file: {:#?}",
+                    &tag.config
+                ))
+                .map_err(Into::into),
+            None => Err(anyhow!("Tag: '{}' is not in repo")),
+        }
+    }
+
     pub fn repositories(&self) -> HashSet<&Repository> {
         self.data.repositories.iter().collect()
     }
@@ -131,10 +143,13 @@ impl CacheData {
 
                     debug!("Loading Tag: {:#?}", file);
                     let content = util::read_content(&file)?;
-                    let tag: Tag = toml::from_str(&content).context(format!(
+                    let mut tag: Tag = toml::from_str(&content).context(format!(
                         "could not serialize content into Tag:\n\n{}",
                         content
                     ))?;
+
+                    tag.config = file;
+                    tag.location = location;
 
                     debug!("Inserting into cache: {}", tag.name);
                     tags.insert(tag);
