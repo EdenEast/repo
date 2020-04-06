@@ -53,7 +53,7 @@ impl CliCommand for ConfigCommand {
         }
     }
 
-    fn run(self) -> Result<()> {
+    fn run(self, _: &ArgMatches) -> Result<()> {
         let mut workspace = Workspace::new()?;
 
         match (self.name.as_ref(), self.value.as_ref()) {

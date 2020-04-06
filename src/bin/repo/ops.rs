@@ -16,7 +16,7 @@ macro_rules! define_app {
         pub fn run() -> Result<()> {
             let matches = app().get_matches();
             match matches.subcommand() {
-                $( ($name, Some(m)) => <$t>::from_matches(m).run(), )*
+                $( ($name, Some(m)) => <$t>::from_matches(m).run(m), )*
                 _ => unreachable!(),
             }
         }
@@ -28,15 +28,17 @@ define_app! {
     "config" => [self::config::ConfigCommand: &[]],
     "list" => [self::list::ListCommand: &[]],
     "remove" => [self::remove::RemoveCommand: &[]],
+    "tag" => [self::tag::TagCommand: &[]],
 }
 
 pub trait CliCommand {
     fn app<'a, 'b: 'a>(app: App<'a, 'b>) -> App<'a, 'b>;
     fn from_matches(m: &ArgMatches) -> Self;
-    fn run(self) -> Result<()>;
+    fn run(self, m: &ArgMatches) -> Result<()>;
 }
 
 mod add;
 mod config;
 mod list;
 mod remove;
+mod tag;
