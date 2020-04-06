@@ -75,6 +75,11 @@ impl Workspace {
         self.cache.remove_repository(&name)
     }
 
+    pub fn remove_tag(&mut self, name: &str) -> Result<()> {
+        debug!("Removing tag: '{}' from cache", name);
+        self.cache.remove_tag(&name)
+    }
+
     fn write_repository(&self, repository: &Repository, location: Location) -> Result<()> {
         let path = match location {
             Location::Global => Config::global_path().join("repository"),
