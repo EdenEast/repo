@@ -65,6 +65,10 @@ impl Cache {
     pub fn repositories(&self) -> HashSet<&Repository> {
         self.data.repositories.iter().collect()
     }
+
+    pub fn tags(&self) -> HashSet<&Tag> {
+        self.data.tags.iter().collect()
+    }
 }
 
 impl CacheData {

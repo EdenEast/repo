@@ -8,6 +8,7 @@ macro_rules! define_app {
     ($( $name:expr => [$t:ty: $aliases:expr], )*) => {
         fn app<'a, 'b: 'a>() -> App<'a, 'b> {
             app_from_crate!()
+                .bin_name(crate_name!()) // stop windows from adding .exe
                 .setting(AppSettings::VersionlessSubcommands)
                 .setting(AppSettings::SubcommandRequiredElseHelp)
                 $( .subcommand(<$t>::app(SubCommand::with_name($name)).aliases($aliases)) )*

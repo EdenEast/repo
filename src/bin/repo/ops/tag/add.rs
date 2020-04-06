@@ -1,7 +1,7 @@
 use crate::ops::CliCommand;
 use anyhow::Result;
 use clap::{App, Arg, ArgMatches};
-use repo::{Location, Tag, Workspace};
+use repo::{Location, TagBuilder, Workspace};
 
 pub struct AddCommand {
     name: String,
@@ -46,10 +46,7 @@ impl CliCommand for AddCommand {
     fn run(self, _: &ArgMatches) -> Result<()> {
         let mut workspace = Workspace::new()?;
 
-        println!("{:#?}", workspace);
-
         debug!("Name of new tag is: {}", self.name);
-        let tag = Tag::new(&self.name);
 
         let location = if self.local {
             Location::Local
@@ -57,6 +54,7 @@ impl CliCommand for AddCommand {
             Location::Global
         };
 
+        let tag = TagBuilder::new(&self.name).location(location).build();
         workspace.add_tag(tag, location)
     }
 }

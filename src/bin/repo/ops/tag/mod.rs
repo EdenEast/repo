@@ -38,6 +38,8 @@ macro_rules! define_run {
 
 define_run! {
     "add" => [self::add::AddCommand: &[]],
+    "list" => [self::list::ListCommand: &[]],
 }
 
 mod add;
+mod list;
