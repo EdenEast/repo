@@ -10,7 +10,7 @@ pub use query::Query;
 pub use remote::Remote;
 pub use repository::{Repository, RepositoryBuilder};
 pub use scp::ScpPath;
-pub use tag::Tag;
+pub use tag::{Tag, TagBuilder};
 pub use workspace::Workspace;
 
 pub mod prelude;
