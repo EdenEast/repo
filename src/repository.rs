@@ -103,13 +103,12 @@ impl RepositoryBuilder {
 mod tests {
     use super::*;
     use crate::Query;
+    use url::Url;
 
     #[test]
     fn build() -> Result<()> {
-        let remote = Remote::from_query(
-            "origin",
-            "https://github.com/edeneast/repo".parse::<Query>()?,
-        )?;
+        let url: Url = "https://github.com/edeneast/repo".parse()?;
+        let remote = Remote::new(url);
         let repo = RepositoryBuilder::new("repo")
             .remote(remote.clone())
             .build();

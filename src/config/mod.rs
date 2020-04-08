@@ -1,3 +1,4 @@
+use crate::query::Scheme;
 use serde::{Deserialize, Serialize};
 use std::{collections::HashSet, path::PathBuf};
 
@@ -8,11 +9,13 @@ pub struct Config {
     default: ConfigData,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug)]
 pub struct ConfigData {
     root: Option<PathBuf>,
     cli: Option<bool>,
     host: Option<String>,
+    ssh_user: Option<String>,
+    scheme: Option<Scheme>,
     include: HashSet<String>,
     exclude: HashSet<String>,
     path: Option<PathBuf>,
@@ -23,6 +26,8 @@ struct RawConfigData {
     root: Option<String>,
     cli: Option<bool>,
     default_host: Option<String>,
+    default_ssh_user: Option<String>,
+    default_scheme: Option<Scheme>,
     include: Option<HashSet<String>>,
     exclude: Option<HashSet<String>>,
 

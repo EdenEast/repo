@@ -1,5 +1,6 @@
 use crate::{
     config::{Config, ConfigData},
+    query::Scheme,
     util, Location,
 };
 use anyhow::{anyhow, Context, Result};
@@ -158,6 +159,48 @@ impl Config {
         }
     }
 
+    pub fn ssh_user(&self, location: Option<Location>) -> &str {
+        if let Some(l) = location {
+            let result = match l {
+                Location::Global => self.global.ssh_user.as_ref(),
+                Location::Local => self.local.ssh_user.as_ref(),
+            };
+
+            if let Some(user) = result {
+                return user;
+            }
+        }
+
+        if let Some(local) = self.local.ssh_user.as_ref() {
+            local
+        } else if let Some(global) = self.global.ssh_user.as_ref() {
+            global
+        } else {
+            self.default.ssh_user.as_ref().unwrap()
+        }
+    }
+
+    pub fn scheme(&self, location: Option<Location>) -> Scheme {
+        if let Some(l) = location {
+            let result = match l {
+                Location::Global => self.global.scheme,
+                Location::Local => self.local.scheme,
+            };
+
+            if let Some(scheme) = result {
+                return scheme;
+            }
+        }
+
+        if let Some(local) = self.local.scheme {
+            local
+        } else if let Some(global) = self.global.scheme {
+            global
+        } else {
+            self.default.scheme.unwrap()
+        }
+    }
+
     pub fn include_tags(&self, location: Option<Location>) -> Vec<&str> {
         if let Some(l) = location {
             let list = match l {
@@ -258,6 +301,28 @@ impl Config {
         self.global.host = Some(host.to_owned());
     }
 
+    pub fn set_ssh(&mut self, ssh: &str, location: Option<Location>) {
+        if let Some(l) = location {
+            if l == Location::Local {
+                self.local.ssh_user = Some(ssh.to_owned());
+                return;
+            }
+        }
+
+        self.global.ssh_user = Some(ssh.to_owned());
+    }
+
+    pub fn set_scheme(&mut self, scheme: Scheme, location: Option<Location>) {
+        if let Some(l) = location {
+            if l == Location::Local {
+                self.local.scheme = Some(scheme);
+                return;
+            }
+        }
+
+        self.global.scheme = Some(scheme);
+    }
+
     pub fn add_include_tag(&mut self, tag: &str, location: Option<Location>) -> bool {
         if let Some(l) = location {
             if l == Location::Local {
@@ -310,8 +375,7 @@ impl Config {
         let path = data.path.as_ref().unwrap();
         let file = path.join("config.toml");
 
-        let ser = toml::to_string_pretty(data)
-            .context(format!("failed to serialize config to file\n\n{:#?}", file))?;
+        let ser = data.to_string_pretty()?;
 
         debug!("Writing config to disk: {}", path.display());
         util::write_content(&file, |f| {
