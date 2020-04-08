@@ -52,6 +52,7 @@ impl CliCommand for AddCommand {
                         "Override the default path of the repository in the workspace.\n\
                         By default, the workspace path of a repository is based on the name of the repository.\n\
                         This option will override this behaviour and set the workspace path.\n\
+                        If a repository also has a path definition it will override a tag's.\n\
                         Note: Relative paths are relative to the workspace root.")
                     .long("path")
                     .short("p")

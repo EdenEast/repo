@@ -2,9 +2,11 @@ use super::CliCommand;
 use anyhow::{anyhow, Result};
 use clap::{App, Arg, ArgMatches};
 use repo::prelude::*;
+use std::path::PathBuf;
 
 pub struct EditCommand {
     name: String,
+    path: Option<String>,
     local: bool,
     global: bool,
     edit: bool,
@@ -41,6 +43,19 @@ impl CliCommand for EditCommand {
                         "Open cache file in $EDITOR. If $EDITOR is not defined will open in vim",
                     ),
             )
+            .arg(
+                Arg::with_name("path")
+                    .help("Override the default path of an attached repository in the workspace.")
+                    .long_help(
+                        "Override the default path of an attached repository in the workspace.\n\
+                        By default, the workspace path of a repository is based on the name of the repository.\n\
+                        This option will override this behaviour and set the workspace path.\n\
+                        If a repository also has a path definition it will override a tag's.\n\
+                        Note: Relative paths are relative to the workspace root.")
+                    .long("path")
+                    .short("p")
+                    .takes_value(true)
+            )
     }
 
     fn from_matches(m: &ArgMatches) -> Self {
@@ -49,6 +64,7 @@ impl CliCommand for EditCommand {
                 .value_of("NAME")
                 .map(String::from)
                 .expect("NAME is a required argument"),
+            path: m.value_of("path").map(String::from),
             local: m.is_present("local"),
             global: m.is_present("global"),
             edit: m.is_present("edit"),
@@ -61,6 +77,10 @@ impl CliCommand for EditCommand {
         let mut repository = workspace
             .take_repository(&self.name)
             .ok_or_else(|| anyhow!("Repository: '{}' is not tracked by repo", &self.name))?;
+
+        if self.path.is_some() {
+            repository.path = self.path.map(PathBuf::from);
+        }
 
         if self.local || self.global {
             let location = if self.local {
