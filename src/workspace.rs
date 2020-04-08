@@ -62,6 +62,10 @@ impl Workspace {
         self.cache.get_repository(&name)
     }
 
+    pub fn take_repository(&mut self, name: &str) -> Option<Repository> {
+        self.cache.take_repository(&name)
+    }
+
     pub fn has_repository(&self, name: &str) -> bool {
         self.cache.has_repository(&name)
     }
@@ -80,7 +84,7 @@ impl Workspace {
         self.cache.remove_tag(&name)
     }
 
-    fn write_repository(&self, repository: &Repository, location: Location) -> Result<()> {
+    pub fn write_repository(&self, repository: &Repository, location: Location) -> Result<()> {
         let path = match location {
             Location::Global => Config::global_path().join("repository"),
             Location::Local => Config::local_path().join("repository"),
@@ -101,7 +105,7 @@ impl Workspace {
         })
     }
 
-    fn write_tag(&self, tag: &Tag, location: Location) -> Result<()> {
+    pub fn write_tag(&self, tag: &Tag, location: Location) -> Result<()> {
         let path = match location {
             Location::Global => Config::global_path().join("tag"),
             Location::Local => Config::local_path().join("tag"),

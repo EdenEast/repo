@@ -1,7 +1,7 @@
 use crate::{config::Config, util, Location, Repository, Tag};
 use anyhow::{anyhow, Context, Result};
 use std::{
-    collections::HashSet,
+    collections::HashMap,
     io::Write,
     path::{Path, PathBuf},
 };
@@ -13,8 +13,8 @@ pub struct Cache {
 
 #[derive(Debug)]
 pub struct CacheData {
-    repositories: HashSet<Repository>,
-    tags: HashSet<Tag>,
+    repositories: HashMap<String, Repository>,
+    tags: HashMap<String, Tag>,
 }
 
 impl Cache {
@@ -26,39 +26,57 @@ impl Cache {
     }
 
     pub fn add_repository(&mut self, repository: Repository) {
-        self.data.repositories.insert(repository);
+        self.data
+            .repositories
+            .insert(repository.name.clone(), repository);
     }
 
     pub fn add_tag(&mut self, tag: Tag) {
-        self.data.tags.insert(tag);
+        self.data.tags.insert(tag.name.clone(), tag);
     }
 
     pub fn get_repository(&self, name: &str) -> Option<&Repository> {
-        self.data.repositories.iter().find(|r| r.name == name)
+        self.data.repositories.get(name)
+    }
+
+    pub fn get_repository_mut(&mut self, name: &str) -> Option<&mut Repository> {
+        self.data.repositories.get_mut(name)
+    }
+
+    pub fn take_repository(&mut self, name: &str) -> Option<Repository> {
+        self.data.repositories.remove(name)
     }
 
     pub fn get_tag(&self, name: &str) -> Option<&Tag> {
-        self.data.tags.iter().find(|r| r.name == name)
+        self.data.tags.get(name)
+    }
+
+    pub fn get_tag_mut(&mut self, name: &str) -> Option<&mut Tag> {
+        self.data.tags.get_mut(name)
+    }
+
+    pub fn take_tag(&mut self, name: &str) -> Option<Tag> {
+        self.data.tags.remove(name)
     }
 
     /// Check if cache contains a repository with the name as a key
     pub fn has_repository(&self, name: &str) -> bool {
-        self.data.repositories.iter().any(|r| r.name == name)
+        self.data.repositories.contains_key(name)
     }
 
     pub fn has_tag(&self, name: &str) -> bool {
-        self.data.tags.iter().any(|r| r.name == name)
+        self.data.tags.contains_key(name)
     }
 
     pub fn remove_repository(&mut self, name: &str) -> Result<()> {
         match self.get_repository(name) {
             Some(repo) => std::fs::remove_file(&repo.config)
                 .context(format!(
-                    "failed to remove repository config file: {:#?}",
-                    &repo.config
+                    "failed to remove repository config file: {}",
+                    &repo.config.display()
                 ))
                 .map_err(Into::into),
-            None => Err(anyhow!("Repository: '{}' is not tracked by repo")),
+            None => Err(anyhow!("Repository: '{}' is not tracked by repo", name)),
         }
     }
 
@@ -70,16 +88,16 @@ impl Cache {
                     &tag.config
                 ))
                 .map_err(Into::into),
-            None => Err(anyhow!("Tag: '{}' is not in repo")),
+            None => Err(anyhow!("Tag: '{}' is not in repo", name)),
         }
     }
 
-    pub fn repositories(&self) -> HashSet<&Repository> {
-        self.data.repositories.iter().collect()
+    pub fn repositories(&self) -> Vec<&Repository> {
+        self.data.repositories.values().collect()
     }
 
-    pub fn tags(&self) -> HashSet<&Tag> {
-        self.data.tags.iter().collect()
+    pub fn tags(&self) -> Vec<&Tag> {
+        self.data.tags.values().collect()
     }
 }
 
@@ -90,8 +108,8 @@ impl CacheData {
             (Config::local_path(), Location::Local),
         ];
 
-        let mut repositories: HashSet<Repository> = HashSet::new();
-        let mut tags: HashSet<Tag> = HashSet::new();
+        let mut repositories = HashMap::new();
+        let mut tags = HashMap::new();
 
         for (path, location) in paths {
             let repo_path = PathBuf::from(&path).join("repository");
@@ -120,7 +138,7 @@ impl CacheData {
                     repository.location = location;
 
                     debug!("Inserting into cache: {}", repository.name);
-                    repositories.insert(repository);
+                    repositories.insert(repository.name.clone(), repository);
                 }
             } else {
                 debug!("Repository folder does not exists");
@@ -152,7 +170,7 @@ impl CacheData {
                     tag.location = location;
 
                     debug!("Inserting into cache: {}", tag.name);
-                    tags.insert(tag);
+                    tags.insert(tag.name.clone(), tag);
                 }
             } else {
                 debug!("Tag folder does not exists");
