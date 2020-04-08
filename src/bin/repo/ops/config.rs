@@ -93,6 +93,8 @@ impl ConfigCommand {
             "root" => println!("{}", config.root(location).display()),
             "cli" => println!("{}", config.cli(location)),
             "host" => println!("{}", config.host(location)),
+            "ssh" => println!("{}", config.ssh_user(location)),
+            "scheme" => println!("{}", config.scheme(location)),
             "include" => {
                 for include in config.include_tags(location) {
                     println!("{}", include);
@@ -122,6 +124,11 @@ impl ConfigCommand {
             "root" => config.set_root(PathBuf::from_str(value)?, location),
             "cli" => config.set_cli(value.parse()?, location),
             "host" => config.set_host(value, location),
+            "ssh" => config.set_ssh(value, location),
+            "scheme" => {
+                let scheme = value.parse()?;
+                config.set_scheme(scheme, location);
+            }
             "include" => {
                 if self.remove {
                     if !config.remove_include_tag(value, location) {

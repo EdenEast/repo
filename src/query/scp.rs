@@ -1,13 +1,13 @@
+use super::ScpPath;
 use anyhow::{anyhow, Result};
 use regex::Regex;
 use std::str::FromStr;
 use url::Url;
 
-#[derive(Debug)]
-pub struct ScpPath {
-    pub username: String,
-    pub host: String,
-    pub path: String,
+impl ScpPath {
+    pub fn parse(s: &str) -> Result<Self> {
+        s.parse()
+    }
 }
 
 impl FromStr for ScpPath {

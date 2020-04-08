@@ -6,10 +6,9 @@ extern crate log;
 
 pub use cache::Cache;
 pub use location::Location;
-pub use query::Query;
+pub use query::{Query, ScpPath};
 pub use remote::Remote;
 pub use repository::{Repository, RepositoryBuilder};
-pub use scp::ScpPath;
 pub use tag::{Tag, TagBuilder};
 pub use workspace::Workspace;
 
@@ -22,6 +21,5 @@ mod location;
 mod query;
 mod remote;
 mod repository;
-mod scp;
 mod tag;
 mod workspace;

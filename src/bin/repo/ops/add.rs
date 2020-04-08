@@ -2,7 +2,6 @@ use super::CliCommand;
 use anyhow::Result;
 use clap::{App, Arg, ArgMatches};
 use repo::prelude::*;
-use std::str::FromStr;
 
 pub struct AddCommand {
     url: String,
@@ -25,7 +24,14 @@ impl CliCommand for AddCommand {
                         - Example: https://github.com/user/repo\n\n  \
                         * <username>@<host>:<path-to-repo>\n    \
                         - Equivalent to `ssh://<username>@<host>/<path-to-repo>.git`\n    \
-                        - Example: git@github.com:user/repo",
+                        - Example: git@github.com:user/repo\n  \
+                        * <path-to-repo>\n    \
+                        - This option uses the config file to construct the url to the remote repository.\n      \
+                        If url or scheme is not defined in the config file they will be defaulted to:\n        \
+                        scheme:   'https'\n        \
+                        host:     'github.com'\n        \
+                        ssh_user: 'git'\n    \
+                        - Example: rust-lang/cargo",
                     )
                     .required(true),
             )
@@ -83,17 +89,17 @@ impl CliCommand for AddCommand {
                 .unwrap()
         });
 
-        debug!("Repo Name: {}", name);
-        debug!("Repo Url : {}", self.url);
-
         let location = if self.local {
             Location::Local
         } else {
             Location::Global
         };
 
+        let query = Query::parse(&self.url)?;
+        let url = query.to_url(&workspace.config());
+
         let mut builder = RepositoryBuilder::new(&name)
-            .remote(Remote::from_query("origin", Query::from_str(&self.url)?)?)
+            .remote(Remote::new(url))
             .location(location);
 
         if let Some(path) = self.path {
