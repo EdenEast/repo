@@ -66,6 +66,14 @@ impl Workspace {
         self.cache.take_repository(&name)
     }
 
+    pub fn get_tag(&mut self, name: &str) -> Option<&Tag> {
+        self.cache.get_tag(&name)
+    }
+
+    pub fn take_tag(&mut self, name: &str) -> Option<Tag> {
+        self.cache.take_tag(&name)
+    }
+
     pub fn has_repository(&self, name: &str) -> bool {
         self.cache.has_repository(&name)
     }

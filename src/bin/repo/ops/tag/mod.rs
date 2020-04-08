@@ -38,10 +38,12 @@ macro_rules! define_run {
 
 define_run! {
     "add" => [self::add::AddCommand: &[]],
+    "edit" => [self::edit::EditCommand: &[]],
     "list" => [self::list::ListCommand: &[]],
     "remove" => [self::remove::RemoveCommand: &[]],
 }
 
 mod add;
+mod edit;
 mod list;
 mod remove;
