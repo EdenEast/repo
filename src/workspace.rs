@@ -30,7 +30,7 @@ impl Workspace {
 
     /// Adds a repository to the cache
     /// Adding a repository to the cache will also write the repository to disk
-    pub fn add_repository(&mut self, repository: Repository, location: Location) -> Result<()> {
+    pub fn add_repository(&mut self, repository: Repository) -> Result<()> {
         if self.has_repository(&repository.name) {
             return Err(anyhow!(
                 "Repository: {} already exist in repo",
@@ -38,7 +38,7 @@ impl Workspace {
             ));
         }
 
-        self.write_repository(&repository, location)?;
+        self.write_repository(&repository)?;
         self.cache.add_repository(repository);
 
         Ok(())
@@ -47,12 +47,12 @@ impl Workspace {
     /// Adds a tag to the cache
     ///
     /// Adding a tag to the cache will also write the tag to disk
-    pub fn add_tag(&mut self, tag: Tag, location: Location) -> Result<()> {
+    pub fn add_tag(&mut self, tag: Tag) -> Result<()> {
         if self.has_tag(&tag.name) {
             return Err(anyhow!("Tag: {} already exist in repo", tag.name));
         }
 
-        self.write_tag(&tag, location)?;
+        self.write_tag(&tag)?;
         self.cache.add_tag(tag);
 
         Ok(())
@@ -92,16 +92,11 @@ impl Workspace {
         self.cache.remove_tag(&name)
     }
 
-    pub fn write_repository(&self, repository: &Repository, location: Location) -> Result<()> {
-        let path = match location {
-            Location::Global => Config::global_path().join("repository"),
-            Location::Local => Config::local_path().join("repository"),
-        };
-
-        let file = path.join(format!("{}.toml", &repository.name));
+    pub fn write_repository(&self, repository: &Repository) -> Result<()> {
+        let file = &repository.config;
         debug!("Writing repository to: {:#?}", file);
 
-        util::write_content(&file, |f| {
+        util::write_content(file, |f| {
             let ser = toml::to_string_pretty(&repository).context(format!(
                 "failed to serialize repository to file\n\n{:#?}",
                 repository
@@ -113,13 +108,10 @@ impl Workspace {
         })
     }
 
-    pub fn write_tag(&self, tag: &Tag, location: Location) -> Result<()> {
-        let path = match location {
-            Location::Global => Config::global_path().join("tag"),
-            Location::Local => Config::local_path().join("tag"),
-        };
+    pub fn write_tag(&self, tag: &Tag) -> Result<()> {
+        let file = &tag.config;
+        debug!("Writing tag to: {:#?}", file);
 
-        let file = path.join(format!("{}.toml", &tag.name));
         util::write_content(&file, |f| {
             let ser = toml::to_string_pretty(&tag)
                 .context(format!("failed to serialize tag to file\n\n{:#?}", tag))?;

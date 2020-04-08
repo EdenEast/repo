@@ -55,6 +55,6 @@ impl CliCommand for AddCommand {
         };
 
         let tag = TagBuilder::new(&self.name).location(location).build();
-        workspace.add_tag(tag, location)
+        workspace.add_tag(tag)
     }
 }
