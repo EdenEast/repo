@@ -6,7 +6,7 @@ pub struct TagCommand {}
 
 impl CliCommand for TagCommand {
     fn app<'a, 'b: 'a>(app: App<'a, 'b>) -> App<'a, 'b> {
-        app.subcommands(internal_commands())
+        app.about("Manage tags").subcommands(internal_commands())
     }
 
     fn from_matches(_: &ArgMatches) -> Self {

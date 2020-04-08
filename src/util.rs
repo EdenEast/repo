@@ -39,6 +39,26 @@ where
     write_fn(&mut file)
 }
 
+pub mod process {
+    use std::process::{Command, Stdio};
+
+    pub fn inherit(name: &str) -> Command {
+        let mut command = Command::new(name);
+        command.stdin(Stdio::inherit());
+        command.stdout(Stdio::inherit());
+        command.stderr(Stdio::inherit());
+        command
+    }
+
+    pub fn piped(name: &str) -> Command {
+        let mut command = Command::new(name);
+        command.stdin(Stdio::piped());
+        command.stdout(Stdio::piped());
+        command.stderr(Stdio::piped());
+        command
+    }
+}
+
 #[cfg(not(windows))]
 pub fn canonicalize<P: AsRef<Path>>(path: P) -> Result<PathBuf> {
     path.as_ref().canonicalize().map_err(Into::into)
