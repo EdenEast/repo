@@ -1,11 +1,13 @@
 use crate::{config::Config, Location, Remote, Tag};
 use anyhow::{anyhow, Context, Result};
 use serde::{Deserialize, Serialize};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 #[derive(Debug, Clone, Serialize, Deserialize, Eq, PartialEq, Hash)]
 pub struct Repository {
     pub name: String,
+    pub path: Option<PathBuf>,
+
     pub tags: Vec<String>,
     pub remotes: Vec<Remote>,
 
@@ -21,21 +23,24 @@ pub struct RepositoryBuilder {
     remotes: Vec<Remote>,
     tags: Vec<String>,
     location: Location,
+    path: Option<PathBuf>,
 }
 
 impl Repository {
+    pub fn path_from_location(location: Location) -> PathBuf {
+        match location {
+            Location::Global => Config::global_path().join("repository"),
+            Location::Local => Config::local_path().join("repository"),
+        }
+    }
+
     pub fn set_location(&mut self, location: Location) {
         if self.location == location {
             return;
         }
 
-        let path = match location {
-            Location::Global => Config::global_path().join("repository"),
-            Location::Local => Config::local_path().join("repository"),
-        };
-
         self.location = location;
-        self.config = path.join(format!("{}.toml", self.name));
+        self.config = Repository::path_from_location(location).join(format!("{}.toml", self.name));
     }
 
     pub fn del_cache_file(&self) -> Result<()> {
@@ -55,6 +60,7 @@ impl RepositoryBuilder {
             remotes: Vec::new(),
             tags: Vec::new(),
             location: Location::default(),
+            path: None,
         }
     }
 
@@ -73,17 +79,20 @@ impl RepositoryBuilder {
         self
     }
 
-    pub fn build(self) -> Repository {
-        let config = match self.location {
-            Location::Global => Config::global_path(),
-            Location::Local => Config::local_path(),
-        };
+    pub fn path<P: AsRef<Path>>(mut self, path: P) -> Self {
+        self.path = Some(path.as_ref().to_path_buf());
+        self
+    }
 
-        let config = config.join(format!("{}.toml", self.name));
+    pub fn build(self) -> Repository {
+        let config =
+            Repository::path_from_location(self.location).join(format!("{}.toml", self.name));
+
         Repository {
             name: self.name,
             remotes: self.remotes,
             tags: self.tags,
+            path: self.path,
             location: self.location,
             config,
         }

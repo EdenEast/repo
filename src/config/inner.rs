@@ -310,11 +310,11 @@ impl Config {
         let path = data.path.as_ref().unwrap();
         let file = path.join("config.toml");
 
+        let ser = toml::to_string_pretty(data)
+            .context(format!("failed to serialize config to file\n\n{:#?}", file))?;
+
         debug!("Writing config to disk: {}", path.display());
         util::write_content(&file, |f| {
-            let ser = toml::to_string_pretty(data)
-                .context(format!("failed to serialize config to file\n\n{:#?}", file))?;
-
             f.write_fmt(format_args!("{}", ser))
                 .context(format!("failed to write file: {:#?}", file))
                 .map_err(Into::into)
