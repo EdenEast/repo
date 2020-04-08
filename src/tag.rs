@@ -1,11 +1,12 @@
 use crate::{config::Config, Location};
 use anyhow::{Context, Result};
 use serde::{Deserialize, Serialize};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 #[derive(Debug, Serialize, Deserialize, Eq, PartialEq, Hash)]
 pub struct Tag {
     pub name: String,
+    pub path: Option<PathBuf>,
 
     #[serde(skip)]
     pub config: PathBuf,
@@ -17,21 +18,24 @@ pub struct Tag {
 pub struct TagBuilder {
     name: String,
     location: Location,
+    path: Option<PathBuf>,
 }
 
 impl Tag {
+    pub fn path_from_location(location: Location) -> PathBuf {
+        match location {
+            Location::Global => Config::global_path().join("tag"),
+            Location::Local => Config::local_path().join("tag"),
+        }
+    }
+
     pub fn set_location(&mut self, location: Location) {
         if self.location == location {
             return;
         }
 
-        let path = match location {
-            Location::Global => Config::global_path().join("tag"),
-            Location::Local => Config::local_path().join("tag"),
-        };
-
         self.location = location;
-        self.config = path.join(format!("{}.toml", self.name));
+        self.config = Tag::path_from_location(location).join(format!("{}.toml", self.name));
     }
 
     pub fn del_cache_file(&self) -> Result<()> {
@@ -49,6 +53,7 @@ impl TagBuilder {
         Self {
             name: name.to_owned(),
             location: Location::default(),
+            path: None,
         }
     }
 
@@ -57,16 +62,18 @@ impl TagBuilder {
         self
     }
 
-    pub fn build(self) -> Tag {
-        let config = match self.location {
-            Location::Global => Config::global_path(),
-            Location::Local => Config::local_path(),
-        };
+    pub fn path<P: AsRef<Path>>(mut self, path: P) -> Self {
+        self.path = Some(path.as_ref().to_path_buf());
+        self
+    }
 
-        let config = config.join(format!("{}.toml", self.name));
+    pub fn build(self) -> Tag {
+        let config = Tag::path_from_location(self.location).join(format!("{}.toml", self.name));
+
         Tag {
             name: self.name,
             location: self.location,
+            path: self.path,
             config,
         }
     }

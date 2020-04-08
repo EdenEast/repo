@@ -7,6 +7,7 @@ use std::str::FromStr;
 pub struct AddCommand {
     url: String,
     name: Option<String>,
+    path: Option<String>,
     local: bool,
 }
 
@@ -32,9 +33,29 @@ impl CliCommand for AddCommand {
             .arg(
                 Arg::with_name("local")
                     .help("Write repository to local cache")
-                    .long_help("Write repository to local cache. Local cache is defined by $REPO_LOCAL_PATH")
+                    .long_help(
+                        "Write repository to local cache.\n\
+                        Local cache is defined by $REPO_LOCAL_PATH environment variable.\n\
+                        If env var is not set then repo will default to your\n\
+                        system's local data folder:\n  \
+                        - linux: $HOME/.local/share/repo\n  \
+                        - windows: C:\\Users\\<USER>\\AppData\\Local\\repo\n  \
+                        - macos: /Users/<USER>/Library/Application Support/repo",
+                    )
                     .long("local")
-                    .short("l")
+                    .short("l"),
+            )
+            .arg(
+                Arg::with_name("path")
+                    .help("Override the default path of the repository in the workspace.")
+                    .long_help(
+                        "Override the default path of the repository in the workspace.\n\
+                        By default, the workspace path of a repository is based on the name of the repository.\n\
+                        This option will override this behaviour and set the workspace path.\n\
+                        Note: Relative paths are relative to the workspace root.")
+                    .long("path")
+                    .short("p")
+                    .takes_value(true)
             )
     }
 
@@ -45,6 +66,7 @@ impl CliCommand for AddCommand {
                 .map(String::from)
                 .expect("URL is a required argument"),
             name: m.value_of("NAME").map(String::from),
+            path: m.value_of("path").map(String::from),
             local: m.is_present("local"),
         }
     }
@@ -60,12 +82,8 @@ impl CliCommand for AddCommand {
                 .unwrap()
         });
 
-        debug!("Name of new repo is: {}", name);
-        debug!("Url of new repo is: {}", self.url);
-
-        let repo = RepositoryBuilder::new(&name)
-            .remote(Remote::from_query("origin", Query::from_str(&self.url)?)?)
-            .build();
+        debug!("Repo Name: {}", name);
+        debug!("Repo Url : {}", self.url);
 
         let location = if self.local {
             Location::Local
@@ -73,8 +91,14 @@ impl CliCommand for AddCommand {
             Location::Global
         };
 
-        debug!("Location is: {:?}", location);
+        let mut builder = RepositoryBuilder::new(&name)
+            .remote(Remote::from_query("origin", Query::from_str(&self.url)?)?)
+            .location(location);
 
-        workspace.add_repository(repo)
+        if let Some(path) = self.path {
+            builder = builder.path(path);
+        }
+
+        workspace.add_repository(builder.build())
     }
 }

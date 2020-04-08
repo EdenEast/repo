@@ -5,6 +5,7 @@ use repo::{Location, TagBuilder, Workspace};
 
 pub struct AddCommand {
     name: String,
+    path: Option<String>,
     local: bool,
 }
 
@@ -31,6 +32,19 @@ impl CliCommand for AddCommand {
                     .long("local")
                     .short("l"),
             )
+            .arg(
+                Arg::with_name("path")
+                    .help("Override the default path of an attached repository in the workspace.")
+                    .long_help(
+                        "Override the default path of an attached repository in the workspace.\n\
+                        By default, the workspace path of a repository is based on the name of the repository.\n\
+                        This option will override this behaviour and set the workspace path.\n\
+                        If a repository also has a path definition it will override a tag's.\n\
+                        Note: Relative paths are relative to the workspace root.")
+                    .long("path")
+                    .short("p")
+                    .takes_value(true)
+            )
     }
 
     fn from_matches(m: &ArgMatches) -> Self {
@@ -39,6 +53,7 @@ impl CliCommand for AddCommand {
                 .value_of("NAME")
                 .map(String::from)
                 .expect("NAME is a required argument"),
+            path: m.value_of("path").map(String::from),
             local: m.is_present("local"),
         }
     }
@@ -54,7 +69,12 @@ impl CliCommand for AddCommand {
             Location::Global
         };
 
-        let tag = TagBuilder::new(&self.name).location(location).build();
-        workspace.add_tag(tag)
+        let mut builder = TagBuilder::new(&self.name).location(location);
+
+        if let Some(path) = self.path {
+            builder = builder.path(path);
+        }
+
+        workspace.add_tag(builder.build())
     }
 }

@@ -96,12 +96,12 @@ impl Workspace {
         let file = &repository.config;
         debug!("Writing repository to: {:#?}", file);
 
-        util::write_content(file, |f| {
-            let ser = toml::to_string_pretty(&repository).context(format!(
-                "failed to serialize repository to file\n\n{:#?}",
-                repository
-            ))?;
+        let ser = toml::to_string_pretty(&repository).context(format!(
+            "failed to serialize repository to file\n\n{:#?}",
+            repository
+        ))?;
 
+        util::write_content(file, |f| {
             f.write_fmt(format_args!("{}", ser))
                 .context(format!("failed to write file: {:#?}", file))
                 .map_err(Into::into)
@@ -112,10 +112,10 @@ impl Workspace {
         let file = &tag.config;
         debug!("Writing tag to: {:#?}", file);
 
-        util::write_content(&file, |f| {
-            let ser = toml::to_string_pretty(&tag)
-                .context(format!("failed to serialize tag to file\n\n{:#?}", tag))?;
+        let ser = toml::to_string_pretty(&tag)
+            .context(format!("failed to serialize tag to file\n\n{:#?}", tag))?;
 
+        util::write_content(&file, |f| {
             f.write_fmt(format_args!("{}", ser))
                 .context(format!("failed to write file: {:#?}", file))
                 .map_err(Into::into)
