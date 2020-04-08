@@ -77,7 +77,7 @@ impl CliCommand for EditCommand {
 
         // NOTE: Saving all of the changes that have been pasased into the edit command. When the
         // editor is open you will see the changes passed written to the cache file.
-        workspace.write_tag(&tag, tag.location)?;
+        workspace.write_tag(&tag)?;
 
         if self.edit {
             let editor = std::env::var("EDITOR").unwrap_or_else(|_| String::from("vim"));

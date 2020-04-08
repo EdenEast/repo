@@ -75,6 +75,6 @@ impl CliCommand for AddCommand {
 
         debug!("Location is: {:?}", location);
 
-        workspace.add_repository(repo, location)
+        workspace.add_repository(repo)
     }
 }
