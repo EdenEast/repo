@@ -57,6 +57,14 @@ pub mod process {
         command.stderr(Stdio::piped());
         command
     }
+
+    pub fn null(name: &str) -> Command {
+        let mut command = Command::new(name);
+        command.stdin(Stdio::null());
+        command.stdout(Stdio::null());
+        command.stderr(Stdio::null());
+        command
+    }
 }
 
 #[cfg(not(windows))]

@@ -1,4 +1,4 @@
-use crate::{config::Config, util, Cache, Location, Repository, Tag};
+use crate::{config::Config, git, util, Cache, Location, Repository, Tag};
 use anyhow::{anyhow, Context, Result};
 use std::{collections::HashMap, io::Write};
 
@@ -90,6 +90,26 @@ impl Workspace {
     pub fn remove_tag(&mut self, name: &str) -> Result<()> {
         debug!("Removing tag: '{}' from cache", name);
         self.cache.remove_tag(&name)
+    }
+
+    pub fn update_remotes(&self, repository: &Repository) -> Result<()> {
+        let workspace_path = self
+            .config
+            .root(None)
+            .join(repository.resolve_workspace_path());
+
+        if workspace_path.is_dir() {
+            git::merge(&workspace_path)?;
+        } else {
+            let remote_name =
+                repository.remotes.get(0).map(|r| &r.name).ok_or_else(|| {
+                    anyhow!("Repository: {} does not have a remote", repository.name)
+                })?;
+            let branch = format!("{}/master", remote_name);
+            git::clone(&workspace_path, &branch, repository.remotes.as_slice())?;
+        }
+
+        Ok(())
     }
 
     pub fn write_repository(&self, repository: &Repository) -> Result<()> {
