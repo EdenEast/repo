@@ -36,6 +36,18 @@ impl Default for ConfigData {
 }
 
 impl ConfigData {
+    pub fn new() -> Self {
+        Self {
+            root: None,
+            cli: None,
+            host: None,
+            ssh_user: None,
+            scheme: None,
+            include: HashSet::new(),
+            exclude: HashSet::new(),
+            path: None,
+        }
+    }
     fn from_raw(raw: RawConfigData) -> Result<Self> {
         let root = raw.root.and_then(|path| util::make_path_buf(path).ok());
 

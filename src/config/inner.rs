@@ -55,7 +55,7 @@ impl Config {
             ConfigData::from_path(global_file)?
         } else {
             debug!("Failed to find file: {:#?}", global_file);
-            let mut data = ConfigData::default();
+            let mut data = ConfigData::new();
             data.path = Some(Config::global_path().to_path_buf());
             data
         };
@@ -69,7 +69,7 @@ impl Config {
             ConfigData::from_path(local_file)?
         } else {
             debug!("Failed to find file: {:#?}", local_file);
-            let mut data = ConfigData::default();
+            let mut data = ConfigData::new();
             data.path = Some(Config::local_path().to_path_buf());
             data
         };
