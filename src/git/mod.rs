@@ -2,28 +2,43 @@ use crate::Remote;
 use anyhow::Result;
 use std::path::Path;
 
-pub fn clone<P>(path: P, branch: &str, remotes: &[Remote]) -> Result<()>
+pub fn clone<P>(path: P, branch: &str, remotes: &[Remote], use_cli: bool) -> Result<()>
 where
     P: AsRef<Path>,
 {
-    cli::init(&path, remotes)?;
-    cli::fetch(&path)?;
-    cli::merge(&path, branch)
+    if use_cli {
+        cli::init(&path, remotes)?;
+        cli::fetch(&path)?;
+        cli::merge(&path, branch)
+    } else {
+        libgit::init(&path, remotes)?;
+        libgit::fetch(&path)?;
+        libgit::inital_merge(&path, branch)
+    }
 }
 
-pub fn fetch<P>(path: P) -> Result<()>
+pub fn fetch<P>(path: P, use_cli: bool) -> Result<()>
 where
     P: AsRef<Path>,
 {
-    cli::fetch(&path)
+    if use_cli {
+        cli::fetch(&path)
+    } else {
+        libgit::fetch(&path)
+    }
 }
 
-pub fn merge<P>(path: P) -> Result<()>
+pub fn merge<P>(path: P, use_cli: bool) -> Result<()>
 where
     P: AsRef<Path>,
 {
-    cli::fetch(&path)?;
-    cli::ff_merge(&path)
+    if use_cli {
+        cli::fetch(&path)?;
+        cli::ff_merge(&path)
+    } else {
+        libgit::fetch(&path)?;
+        libgit::ff_merge(&path)
+    }
 }
 
 pub mod cli;

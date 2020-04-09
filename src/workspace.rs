@@ -98,15 +98,22 @@ impl Workspace {
             .root(None)
             .join(repository.resolve_workspace_path());
 
+        let use_cli = self.config.cli(None);
+
         if workspace_path.is_dir() {
-            git::merge(&workspace_path)?;
+            git::merge(&workspace_path, use_cli)?;
         } else {
             let remote_name =
                 repository.remotes.get(0).map(|r| &r.name).ok_or_else(|| {
                     anyhow!("Repository: {} does not have a remote", repository.name)
                 })?;
             let branch = format!("{}/master", remote_name);
-            git::clone(&workspace_path, &branch, repository.remotes.as_slice())?;
+            git::clone(
+                &workspace_path,
+                &branch,
+                repository.remotes.as_slice(),
+                use_cli,
+            )?;
         }
 
         Ok(())
