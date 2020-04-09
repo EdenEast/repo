@@ -17,6 +17,7 @@ pub mod util;
 
 mod cache;
 mod config;
+mod git;
 mod location;
 mod query;
 mod remote;

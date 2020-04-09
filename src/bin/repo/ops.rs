@@ -31,6 +31,7 @@ define_app! {
     "list" => [self::list::ListCommand: &[]],
     "remove" => [self::remove::RemoveCommand: &[]],
     "tag" => [self::tag::TagCommand: &[]],
+    "update" => [self::update::UpdateCommand: &[]],
 }
 
 pub trait CliCommand {
@@ -45,3 +46,4 @@ mod edit;
 mod list;
 mod remove;
 mod tag;
+mod update;

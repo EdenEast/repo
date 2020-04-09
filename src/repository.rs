@@ -27,6 +27,13 @@ pub struct RepositoryBuilder {
 }
 
 impl Repository {
+    pub fn resolve_workspace_path(&self) -> PathBuf {
+        self.path
+            .as_ref()
+            .map(|s| s.join(&self.name))
+            .unwrap_or_else(|| PathBuf::from(&self.name))
+    }
+
     pub fn path_from_location(location: Location) -> PathBuf {
         match location {
             Location::Global => Config::global_path().join("repository"),
