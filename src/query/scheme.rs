@@ -3,7 +3,7 @@ use anyhow::{anyhow, Error, Result};
 use std::{fmt, str::FromStr};
 
 impl Scheme {
-    pub fn to_url_scheme(&self) -> String {
+    pub fn to_url_scheme(self) -> String {
         match self {
             Scheme::Git => "git://".to_owned(),
             Scheme::Http => "http://".to_owned(),

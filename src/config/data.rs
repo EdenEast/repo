@@ -58,14 +58,14 @@ impl ConfigData {
     }
 
     fn to_raw(&self) -> RawConfigData {
-        let include = if self.include.len() > 0 {
-            Some(self.include.iter().map(|s| s.clone()).collect())
+        let include = if self.include.is_empty() {
+            Some(self.include.iter().cloned().collect())
         } else {
             None
         };
 
-        let exclude = if self.include.len() > 0 {
-            Some(self.exclude.iter().map(|s| s.clone()).collect())
+        let exclude = if self.include.is_empty() {
+            Some(self.exclude.iter().cloned().collect())
         } else {
             None
         };
