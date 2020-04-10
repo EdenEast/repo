@@ -1,14 +1,17 @@
 use crate::{config::Config, Location, Remote, Tag};
 use anyhow::{anyhow, Context, Result};
 use serde::{Deserialize, Serialize};
-use std::path::{Path, PathBuf};
+use std::{
+    collections::HashSet,
+    path::{Path, PathBuf},
+};
 
-#[derive(Debug, Clone, Serialize, Deserialize, Eq, PartialEq, Hash)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Repository {
     pub name: String,
     pub path: Option<PathBuf>,
 
-    pub tags: Vec<String>,
+    pub tags: HashSet<String>,
     pub remotes: Vec<Remote>,
 
     #[serde(skip)]
@@ -21,7 +24,7 @@ pub struct Repository {
 pub struct RepositoryBuilder {
     name: String,
     remotes: Vec<Remote>,
-    tags: Vec<String>,
+    tags: HashSet<String>,
     location: Location,
     path: Option<PathBuf>,
 }
@@ -65,7 +68,7 @@ impl RepositoryBuilder {
         Self {
             name: name.to_owned(),
             remotes: Vec::new(),
-            tags: Vec::new(),
+            tags: HashSet::new(),
             location: Location::default(),
             path: None,
         }
@@ -77,7 +80,7 @@ impl RepositoryBuilder {
     }
 
     pub fn tag(mut self, tag: String) -> Self {
-        self.tags.push(tag);
+        self.tags.insert(tag);
         self
     }
 
