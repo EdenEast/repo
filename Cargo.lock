@@ -552,6 +552,7 @@ dependencies = [
  "anyhow",
  "better-panic",
  "clap",
+ "dialoguer",
  "dirs",
  "git2",
  "git2_credentials",
