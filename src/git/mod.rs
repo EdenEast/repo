@@ -11,9 +11,7 @@ where
         cli::fetch(&path)?;
         cli::merge(&path, branch)
     } else {
-        libgit::init(&path, remotes)?;
-        libgit::fetch(&path)?;
-        libgit::inital_merge(&path, branch)
+        libgit::clone(&path, remotes)
     }
 }
 
