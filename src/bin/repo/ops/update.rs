@@ -16,13 +16,22 @@ impl CliCommand for UpdateCommand {
                 Arg::with_name("local")
                     .help("Perform operation on only local repositories")
                     .long("local")
-                    .short("l"),
+                    .short("l")
+                    .conflicts_with_all(&["all", "global"]),
             )
             .arg(
                 Arg::with_name("global")
                     .help("Perform operation on only global repositories")
                     .long("global")
-                    .short("g"),
+                    .short("g")
+                    .conflicts_with_all(&["local", "all"]),
+            )
+            .arg(
+                Arg::with_name("all")
+                    .help("Perform operation on all repositories, global and local")
+                    .long("all")
+                    .short("a")
+                    .conflicts_with_all(&["local", "global"]),
             )
             .arg(
                 Arg::with_name("tag")
