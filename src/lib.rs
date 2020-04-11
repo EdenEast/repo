@@ -13,6 +13,7 @@ pub use tag::{Tag, TagBuilder};
 pub use workspace::Workspace;
 
 pub mod prelude;
+pub mod shell;
 pub mod util;
 
 mod cache;

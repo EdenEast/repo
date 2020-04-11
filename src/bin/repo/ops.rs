@@ -29,10 +29,12 @@ define_app! {
     "config" => [self::config::ConfigCommand: &[]],
     "edit" => [self::edit::EditCommand: &[]],
     "foreach" => [self::foreach::ForeachCommand: &[]],
+    "init" => [self::init::InitCommand: &[]],
     "list" => [self::list::ListCommand: &[]],
     "remove" => [self::remove::RemoveCommand: &[]],
     "tag" => [self::tag::TagCommand: &[]],
     "update" => [self::update::UpdateCommand: &[]],
+    "work" => [self::work::WorkCommand: &[]],
 }
 
 pub trait CliCommand {
@@ -45,7 +47,9 @@ mod add;
 mod config;
 mod edit;
 mod foreach;
+mod init;
 mod list;
 mod remove;
 mod tag;
 mod update;
+mod work;
