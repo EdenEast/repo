@@ -5,6 +5,7 @@ use repo::prelude::*;
 
 pub struct WorkCommand {
     name: String,
+    quick: bool,
 }
 
 impl CliCommand for WorkCommand {
@@ -16,6 +17,16 @@ impl CliCommand for WorkCommand {
                     .help("Name of the tracked repository to be worked on")
                     .required(true),
             )
+            .arg(
+                Arg::with_name("quick")
+                    .help("Only change directory to repository in workspace")
+                    .long_help(
+                        "Only change directory to repository in workspace.\n\
+                        This will not run the after 'work' post hook.",
+                    )
+                    .long("quick")
+                    .short("q"),
+            )
     }
 
     fn from_matches(m: &ArgMatches) -> Self {
@@ -24,6 +35,7 @@ impl CliCommand for WorkCommand {
                 .value_of("NAME")
                 .map(String::from)
                 .expect("NAME is a required argument"),
+            quick: m.is_present("quick"),
         }
     }
 
@@ -45,8 +57,10 @@ impl CliCommand for WorkCommand {
         let mut commands = Vec::new();
         commands.push(format!("cd {}", path.display()));
 
-        if let Some(work) = &repo.work {
-            commands.push(work.clone());
+        if !self.quick {
+            if let Some(work) = &repo.work {
+                commands.push(work.clone());
+            }
         }
 
         println!("{}", commands.join(" && "));
