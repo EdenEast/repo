@@ -70,12 +70,14 @@ impl Cache {
 
     pub fn remove_repository(&mut self, name: &str) -> Result<()> {
         match self.get_repository(name) {
-            Some(repo) => std::fs::remove_file(&repo.config)
-                .context(format!(
+            Some(repo) => {
+                std::fs::remove_file(&repo.config).context(format!(
                     "failed to remove repository config file: {}",
                     &repo.config.display()
-                ))
-                .map_err(Into::into),
+                ))?;
+                self.data.repositories.remove(name);
+                Ok(())
+            }
             None => Err(anyhow!("Repository: '{}' is not tracked by repo", name)),
         }
     }

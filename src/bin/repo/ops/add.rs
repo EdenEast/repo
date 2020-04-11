@@ -1,5 +1,5 @@
 use super::CliCommand;
-use anyhow::Result;
+use anyhow::{anyhow, Result};
 use clap::{values_t, App, Arg, ArgMatches};
 use repo::prelude::*;
 
@@ -11,6 +11,7 @@ pub struct AddCommand {
     clone: Option<String>,
     work: Option<String>,
     local: bool,
+    force: bool,
     cli: bool,
 }
 
@@ -107,6 +108,12 @@ impl CliCommand for AddCommand {
                     .value_name("COMMAND")
             )
             .arg(
+                Arg::with_name("force")
+                    .help("Override repository if it is already tracked by repo")
+                    .long("force")
+                    .short("f"),
+            )
+            .arg(
                 Arg::with_name("cli")
                     .help("Flag repository to interact with git through the command line")
                     .long_help(
@@ -132,6 +139,7 @@ impl CliCommand for AddCommand {
             clone: m.value_of("clone").map(String::from),
             work: m.value_of("work").map(String::from),
             local: m.is_present("local"),
+            force: m.is_present("force"),
             cli: m.is_present("cli"),
         }
     }
@@ -152,6 +160,17 @@ impl CliCommand for AddCommand {
         } else {
             Location::Global
         };
+
+        if workspace.get_repository(&name).is_some() {
+            if !self.force {
+                return Err(anyhow!(
+                    "repository: {} already exist in repo, --force to override",
+                    &name
+                ));
+            } else {
+                workspace.remove_repository(&name)?;
+            }
+        }
 
         let query = Query::parse(&self.url)?;
         let url = query.to_url(&workspace.config());
