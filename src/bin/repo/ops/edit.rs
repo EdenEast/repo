@@ -1,12 +1,13 @@
 use super::CliCommand;
 use anyhow::{anyhow, Result};
-use clap::{App, Arg, ArgMatches};
+use clap::{values_t, App, Arg, ArgMatches};
 use repo::prelude::*;
 use std::path::PathBuf;
 
 pub struct EditCommand {
     name: String,
     path: Option<String>,
+    tags: Option<Vec<String>>,
     local: bool,
     global: bool,
     edit: bool,
@@ -45,6 +46,20 @@ impl CliCommand for EditCommand {
                     ),
             )
             .arg(
+                Arg::with_name("tag")
+                    .help("Add tag to repository")
+                    .long_help(
+                        "Add tag to repository. The repository will inherit all properties from\n\
+                        a tag. Tags have a priority and will be ordered by priority. The lowest priority\n\
+                        will be evaluated first.")
+                    .long("tag")
+                    .short("t")
+                    .takes_value(true)
+                    .multiple(true)
+                    .number_of_values(1)
+                    .value_name("TAG")
+                )
+            .arg(
                 Arg::with_name("path")
                     .help("Override the default path of an attached repository in the workspace.")
                     .long_help(
@@ -56,6 +71,7 @@ impl CliCommand for EditCommand {
                     .long("path")
                     .short("p")
                     .takes_value(true)
+                    .value_name("PATH")
             )
             .arg(
                 Arg::with_name("cli")
@@ -77,6 +93,7 @@ impl CliCommand for EditCommand {
                 .value_of("NAME")
                 .map(String::from)
                 .expect("NAME is a required argument"),
+            tags: values_t!(m, "tag", String).ok(),
             path: m.value_of("path").map(String::from),
             local: m.is_present("local"),
             global: m.is_present("global"),
@@ -98,6 +115,12 @@ impl CliCommand for EditCommand {
 
         if self.cli {
             repository.use_cli = Some(self.cli);
+        }
+
+        if let Some(tags) = self.tags {
+            for tag in tags {
+                repository.tags.insert(tag);
+            }
         }
 
         if self.local || self.global {

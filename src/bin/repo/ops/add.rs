@@ -1,12 +1,13 @@
 use super::CliCommand;
 use anyhow::Result;
-use clap::{App, Arg, ArgMatches};
+use clap::{values_t, App, Arg, ArgMatches};
 use repo::prelude::*;
 
 pub struct AddCommand {
     url: String,
     name: Option<String>,
     path: Option<String>,
+    tags: Option<Vec<String>>,
     clone: Option<String>,
     work: Option<String>,
     local: bool,
@@ -54,6 +55,20 @@ impl CliCommand for AddCommand {
                     .long("local")
                     .short("l"),
             )
+            .arg(
+                Arg::with_name("tag")
+                    .help("Add a tag to repository")
+                    .long("tag")
+                    .long_help(
+                        "Add tag to repository. The repository will inherit all properties from\n\
+                        a tag. Tags have a priority and will be ordered by priority. The lowest priority\n\
+                        will be evaluated first.")
+                    .short("t")
+                    .takes_value(true)
+                    .multiple(true)
+                    .number_of_values(1)
+                    .value_name("TAG")
+                )
             .arg(
                 Arg::with_name("path")
                     .help("Override the default path of the repository in the workspace.")
@@ -111,6 +126,7 @@ impl CliCommand for AddCommand {
                 .value_of("URL")
                 .map(String::from)
                 .expect("URL is a required argument"),
+            tags: values_t!(m, "tag", String).ok(),
             name: m.value_of("NAME").map(String::from),
             path: m.value_of("path").map(String::from),
             clone: m.value_of("clone").map(String::from),
@@ -143,6 +159,12 @@ impl CliCommand for AddCommand {
         let mut builder = RepositoryBuilder::new(&name)
             .remote(Remote::new(url))
             .location(location);
+
+        if let Some(tags) = self.tags {
+            for tag in tags {
+                builder = builder.tag(tag);
+            }
+        }
 
         if let Some(path) = self.path {
             builder = builder.path(path);
