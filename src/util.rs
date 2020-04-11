@@ -40,7 +40,11 @@ where
 }
 
 pub mod process {
-    use std::process::{Command, Stdio};
+    use anyhow::Result;
+    use std::{
+        io::{BufRead, BufReader},
+        process::{Command, ExitStatus, Stdio},
+    };
 
     pub fn inherit(name: &str) -> Command {
         let mut command = Command::new(name);
@@ -64,6 +68,51 @@ pub mod process {
         command.stdout(Stdio::null());
         command.stderr(Stdio::null());
         command
+    }
+
+    pub fn execute_command(command: &mut Command, prefix: String) -> Result<ExitStatus> {
+        let mut child = command.spawn()?;
+
+        let stdout_child = if let Some(stdout) = child.stdout.take() {
+            let pre = prefix.clone();
+            Some(std::thread::spawn(move || forward_stdout(stdout, &pre)))
+        } else {
+            None
+        };
+
+        if let Some(stderr) = child.stderr.take() {
+            forward_stdout(stderr, &prefix)?;
+        }
+
+        if let Some(child_thread) = stdout_child {
+            child_thread
+                .join()
+                .expect("failed to join stdout child thread with main thread")?;
+        }
+
+        child.wait().map_err(Into::into)
+    }
+
+    fn forward_stdout<T>(read: T, prefix: &str) -> Result<()>
+    where
+        T: std::io::Read,
+    {
+        let mut buffer = BufReader::new(read);
+        loop {
+            let mut line = String::new();
+            let result = buffer.read_line(&mut line)?;
+            if result == 0 {
+                break;
+            }
+
+            // TODO: Have computed the larget string before calling this
+            // but format does not allow formatting with dynamic variables.
+            // This means that I cant format left based on the max_size
+            let prefix = format!("{:>20.20} |", prefix);
+            print!("{} {}", prefix, line);
+        }
+
+        Ok(())
     }
 }
 

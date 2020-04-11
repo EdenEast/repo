@@ -7,7 +7,9 @@ use std::path::{Path, PathBuf};
 pub struct Tag {
     pub name: String,
     pub path: Option<PathBuf>,
+    pub clone: Option<String>,
     pub work: Option<String>,
+    pub priority: Option<i32>,
 
     #[serde(skip)]
     pub config: PathBuf,
@@ -21,6 +23,8 @@ pub struct TagBuilder {
     location: Location,
     path: Option<PathBuf>,
     work: Option<String>,
+    clone: Option<String>,
+    priority: Option<i32>,
 }
 
 impl Tag {
@@ -56,7 +60,9 @@ impl TagBuilder {
             name: name.to_owned(),
             location: Location::default(),
             path: None,
+            clone: None,
             work: None,
+            priority: None,
         }
     }
 
@@ -70,8 +76,18 @@ impl TagBuilder {
         self
     }
 
+    pub fn clone(mut self, command: String) -> Self {
+        self.clone = Some(command);
+        self
+    }
+
     pub fn work(mut self, command: String) -> Self {
         self.work = Some(command);
+        self
+    }
+
+    pub fn priority(mut self, priority: i32) -> Self {
+        self.priority = Some(priority);
         self
     }
 
@@ -82,7 +98,9 @@ impl TagBuilder {
             name: self.name,
             location: self.location,
             path: self.path,
+            clone: self.clone,
             work: self.work,
+            priority: self.priority,
             config,
         }
     }

@@ -2,7 +2,6 @@ use super::CliCommand;
 use anyhow::{anyhow, Result};
 use clap::{values_t, App, Arg, ArgMatches};
 use repo::{prelude::*, util::process};
-use std::io::{BufRead, BufReader};
 
 pub struct ForeachCommand {
     cmd: String,
@@ -90,71 +89,44 @@ impl CliCommand for ForeachCommand {
                 .collect::<Vec<&Repository>>();
         }
 
-        let mut largest = 0u8;
-        for repository in repositories.iter() {
-            let len = repository.name.len() as u8;
-            if len > largest {
-                largest = len;
-            }
-        }
+        // NOTE: For now format! macro cannot dynamicly format padding. Would
+        // have to use some template engine to accomplish this. Dont have to iterate
+        // to find the largest name for now
+        //
+        // let mut largest = 0u8;
+        // for repository in repositories.iter() {
+        //     let len = repository.name.len() as u8;
+        //     if len > largest {
+        //         largest = len;
+        //     }
+        // }
+
+        // Getting the shell that will run the command from the configuration
+        let shell = workspace.config().shell(None);
+        let program = shell.first().ok_or_else(|| {
+            anyhow!("'shell' option in configuration must have at least one field")
+        })?;
+        let rest: &[&str] = shell.split_at(1).1;
 
         let workspace_root = workspace.config().root(None);
         for repository in repositories {
             let cwd = workspace_root.join(repository.resolve_workspace_path());
             let name = repository.name.as_str();
-            let mut child = process::piped(&self.cmd)
-                .current_dir(cwd.to_str().unwrap())
-                .env("REPO_NAME", name)
-                .spawn()?;
 
-            // Spawn a thread that will forward stdout as we cant handle both stdout and stderr
-            let stdout_child = if let Some(stdout) = child.stdout.take() {
-                let prefix = name.to_owned();
-                Some(std::thread::spawn(move || {
-                    ForeachCommand::forward_stdout(stdout, &prefix, largest)
-                }))
-            } else {
-                None
-            };
+            let cmd = self.cmd.to_owned();
+            let mut command = process::piped(program);
+            let status = process::execute_command(
+                command
+                    .args(rest)
+                    .arg(&cmd)
+                    .current_dir(cwd)
+                    .env("REPO_NAME", name),
+                name.to_owned(),
+            )?;
 
-            if let Some(stderr) = child.stderr.take() {
-                ForeachCommand::forward_stdout(stderr, &name, largest)?;
-            }
-
-            if let Some(child_thread) = stdout_child {
-                child_thread
-                    .join()
-                    .expect("failed to join stdout child thread with main thread")?;
-            }
-
-            let status = child.wait()?;
             if !status.success() {
                 return Err(anyhow!("External command failed: {}", self.cmd));
             }
-        }
-
-        Ok(())
-    }
-}
-
-impl ForeachCommand {
-    fn forward_stdout<T>(read: T, prefix: &str, _max_size: u8) -> Result<()>
-    where
-        T: std::io::Read,
-    {
-        let mut buffer = BufReader::new(read);
-        loop {
-            let mut line = String::new();
-            let result = buffer.read_line(&mut line)?;
-            if result == 0 {
-                break;
-            }
-
-            // TODO: Have computed the larget string before calling this
-            // but format does not allow formatting with dynamic variables.
-            // This means that I cant format left based on the max_size
-            let prefix = format!("{:>20.20} |", prefix);
-            print!("{} {}", prefix, line);
         }
 
         Ok(())
