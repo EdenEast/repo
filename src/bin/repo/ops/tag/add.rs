@@ -6,6 +6,7 @@ use repo::{Location, TagBuilder, Workspace};
 pub struct AddCommand {
     name: String,
     path: Option<String>,
+    work: Option<String>,
     local: bool,
 }
 
@@ -45,6 +46,18 @@ impl CliCommand for AddCommand {
                     .short("p")
                     .takes_value(true)
             )
+            .arg(
+                Arg::with_name("work")
+                    .help("Execute command after calling the work command")
+                    .long_help(
+                        "Execute command after calling the work command. If a repository contains links to\n\
+                        tags that also contain 'work' actions the repository actions will be executed first followed\n\
+                        by the tags, ordered by priority")
+                    .long("work")
+                    .short("w")
+                    .takes_value(true)
+                    .value_name("COMMAND")
+            )
     }
 
     fn from_matches(m: &ArgMatches) -> Self {
@@ -54,6 +67,7 @@ impl CliCommand for AddCommand {
                 .map(String::from)
                 .expect("NAME is a required argument"),
             path: m.value_of("path").map(String::from),
+            work: m.value_of("work").map(String::from),
             local: m.is_present("local"),
         }
     }
@@ -73,6 +87,10 @@ impl CliCommand for AddCommand {
 
         if let Some(path) = self.path {
             builder = builder.path(path);
+        }
+
+        if let Some(work) = self.work {
+            builder = builder.work(work);
         }
 
         workspace.add_tag(builder.build())
