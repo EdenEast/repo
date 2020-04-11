@@ -7,6 +7,7 @@ pub struct AddCommand {
     url: String,
     name: Option<String>,
     path: Option<String>,
+    work: Option<String>,
     local: bool,
 }
 
@@ -64,6 +65,18 @@ impl CliCommand for AddCommand {
                     .short("p")
                     .takes_value(true)
             )
+            .arg(
+                Arg::with_name("work")
+                    .help("Execute command after calling the work command")
+                    .long_help(
+                        "Execute command after calling the work command. If this repository contains links to\n\
+                        tags that also contain 'work' actions the repository actions will be executed first followed\n\
+                        by the tags, ordered by priority")
+                    .long("work")
+                    .short("w")
+                    .takes_value(true)
+                    .value_name("COMMAND")
+            )
     }
 
     fn from_matches(m: &ArgMatches) -> Self {
@@ -74,6 +87,7 @@ impl CliCommand for AddCommand {
                 .expect("URL is a required argument"),
             name: m.value_of("NAME").map(String::from),
             path: m.value_of("path").map(String::from),
+            work: m.value_of("work").map(String::from),
             local: m.is_present("local"),
         }
     }
@@ -104,6 +118,10 @@ impl CliCommand for AddCommand {
 
         if let Some(path) = self.path {
             builder = builder.path(path);
+        }
+
+        if let Some(work) = self.work {
+            builder = builder.work(work);
         }
 
         workspace.add_repository(builder.build())

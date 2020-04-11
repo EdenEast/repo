@@ -45,6 +45,10 @@ impl CliCommand for WorkCommand {
         let mut commands = Vec::new();
         commands.push(format!("cd {}", path.display()));
 
+        if let Some(work) = &repo.work {
+            commands.push(work.clone());
+        }
+
         println!("{}", commands.join(" && "));
 
         Ok(())

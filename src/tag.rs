@@ -7,6 +7,7 @@ use std::path::{Path, PathBuf};
 pub struct Tag {
     pub name: String,
     pub path: Option<PathBuf>,
+    pub work: Option<String>,
 
     #[serde(skip)]
     pub config: PathBuf,
@@ -19,6 +20,7 @@ pub struct TagBuilder {
     name: String,
     location: Location,
     path: Option<PathBuf>,
+    work: Option<String>,
 }
 
 impl Tag {
@@ -54,6 +56,7 @@ impl TagBuilder {
             name: name.to_owned(),
             location: Location::default(),
             path: None,
+            work: None,
         }
     }
 
@@ -67,6 +70,11 @@ impl TagBuilder {
         self
     }
 
+    pub fn work(mut self, command: String) -> Self {
+        self.work = Some(command);
+        self
+    }
+
     pub fn build(self) -> Tag {
         let config = Tag::path_from_location(self.location).join(format!("{}.toml", self.name));
 
@@ -74,6 +82,7 @@ impl TagBuilder {
             name: self.name,
             location: self.location,
             path: self.path,
+            work: self.work,
             config,
         }
     }

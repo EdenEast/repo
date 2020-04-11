@@ -10,6 +10,8 @@ use std::{
 pub struct Repository {
     pub name: String,
     pub path: Option<PathBuf>,
+    pub work: Option<String>,
+    pub clone: Option<String>,
 
     pub tags: HashSet<String>,
     pub remotes: Vec<Remote>,
@@ -27,6 +29,8 @@ pub struct RepositoryBuilder {
     tags: HashSet<String>,
     location: Location,
     path: Option<PathBuf>,
+    work: Option<String>,
+    clone: Option<String>,
 }
 
 impl Repository {
@@ -71,6 +75,8 @@ impl RepositoryBuilder {
             tags: HashSet::new(),
             location: Location::default(),
             path: None,
+            work: None,
+            clone: None,
         }
     }
 
@@ -94,6 +100,16 @@ impl RepositoryBuilder {
         self
     }
 
+    pub fn work(mut self, command: String) -> Self {
+        self.work = Some(command);
+        self
+    }
+
+    pub fn clone(mut self, command: String) -> Self {
+        self.clone = Some(command);
+        self
+    }
+
     pub fn build(self) -> Repository {
         let config =
             Repository::path_from_location(self.location).join(format!("{}.toml", self.name));
@@ -103,6 +119,8 @@ impl RepositoryBuilder {
             remotes: self.remotes,
             tags: self.tags,
             path: self.path,
+            work: self.work,
+            clone: self.clone,
             location: self.location,
             config,
         }
