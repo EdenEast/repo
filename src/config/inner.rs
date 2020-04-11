@@ -201,6 +201,27 @@ impl Config {
         }
     }
 
+    pub fn shell(&self, location: Option<Location>) -> Vec<&str> {
+        if let Some(l) = location {
+            let list = match l {
+                Location::Global => &self.global.shell,
+                Location::Local => &self.local.shell,
+            };
+
+            if let Some(list) = list {
+                return list.iter().map(AsRef::as_ref).collect();
+            }
+        }
+
+        self.default
+            .shell
+            .as_ref()
+            .unwrap()
+            .iter()
+            .map(AsRef::as_ref)
+            .collect()
+    }
+
     pub fn include_tags(&self, location: Option<Location>) -> Vec<&str> {
         if let Some(l) = location {
             let list = match l {
@@ -321,6 +342,20 @@ impl Config {
         }
 
         self.global.scheme = Some(scheme);
+    }
+
+    pub fn set_shell(&mut self, shell: &str, location: Option<Location>) {
+        let split = shell.split_whitespace();
+        let list: HashSet<String> = split.map(String::from).collect();
+
+        if let Some(l) = location {
+            if l == Location::Local {
+                self.local.shell = Some(list);
+                return;
+            }
+        }
+
+        self.global.shell = Some(list);
     }
 
     pub fn add_include_tag(&mut self, tag: &str, location: Option<Location>) -> bool {

@@ -22,12 +22,17 @@ lazy_static! {
 
 impl Default for ConfigData {
     fn default() -> Self {
+        let mut shell = HashSet::with_capacity(2);
+        shell.insert(String::from("sh"));
+        shell.insert(String::from("-c"));
+
         Self {
             root: Some((*DEFAULT_ROOT).to_path_buf()),
             cli: Some(false),
             host: Some("github.com".to_owned()),
             ssh_user: Some("git".to_owned()),
             scheme: Some(Scheme::Https),
+            shell: Some(shell),
             include: HashSet::new(),
             exclude: HashSet::new(),
             path: None,
@@ -43,6 +48,7 @@ impl ConfigData {
             host: None,
             ssh_user: None,
             scheme: None,
+            shell: None,
             include: HashSet::new(),
             exclude: HashSet::new(),
             path: None,
@@ -57,6 +63,7 @@ impl ConfigData {
             host: raw.default_host,
             ssh_user: raw.default_ssh_user,
             scheme: raw.default_scheme,
+            shell: raw.shell,
             include: raw.include.unwrap_or_default(),
             exclude: raw.exclude.unwrap_or_default(),
             path: Some(raw.path),
@@ -82,12 +89,18 @@ impl ConfigData {
             None
         };
 
+        let shell = match &self.shell {
+            Some(shell) => Some(shell.iter().cloned().collect()),
+            None => None,
+        };
+
         RawConfigData {
             root: self.root.clone().map(|p| format!("{}", p.display())),
             cli: self.cli,
             default_host: self.host.clone(),
             default_ssh_user: self.ssh_user.clone(),
             default_scheme: self.scheme,
+            shell,
             include,
             exclude,
             path: self.path.clone().unwrap(),

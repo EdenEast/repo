@@ -1,8 +1,8 @@
-use crate::{config::Config, Location, Remote, Tag};
+use crate::{config::Config, Cache, Location, Remote, Tag};
 use anyhow::{anyhow, Context, Result};
 use serde::{Deserialize, Serialize};
 use std::{
-    collections::HashSet,
+    collections::BTreeSet,
     path::{Path, PathBuf},
 };
 
@@ -13,7 +13,7 @@ pub struct Repository {
     pub work: Option<String>,
     pub clone: Option<String>,
 
-    pub tags: HashSet<String>,
+    pub tags: BTreeSet<String>,
     pub remotes: Vec<Remote>,
 
     #[serde(skip)]
@@ -26,7 +26,7 @@ pub struct Repository {
 pub struct RepositoryBuilder {
     name: String,
     remotes: Vec<Remote>,
-    tags: HashSet<String>,
+    tags: BTreeSet<String>,
     location: Location,
     path: Option<PathBuf>,
     work: Option<String>,
@@ -46,6 +46,21 @@ impl Repository {
             Location::Global => Config::global_path().join("repository"),
             Location::Local => Config::local_path().join("repository"),
         }
+    }
+
+    pub fn resolve_from_tags<F>(&self, cache: &Cache, resolver: F) -> Vec<String>
+    where
+        F: Fn(&Tag) -> Option<String>,
+    {
+        let tags = cache.tags();
+        let mut priority: Vec<(String, i32)> = tags
+            .iter()
+            .filter(|t| self.tags.contains(&t.name))
+            .flat_map(|t| resolver(t).map(|value| (value, t.priority.unwrap_or(50))))
+            .collect();
+
+        priority.sort_by_key(|v| v.1);
+        priority.into_iter().map(|v| v.0).collect()
     }
 
     pub fn set_location(&mut self, location: Location) {
@@ -72,7 +87,7 @@ impl RepositoryBuilder {
         Self {
             name: name.to_owned(),
             remotes: Vec::new(),
-            tags: HashSet::new(),
+            tags: BTreeSet::new(),
             location: Location::default(),
             path: None,
             work: None,
@@ -100,13 +115,13 @@ impl RepositoryBuilder {
         self
     }
 
-    pub fn work(mut self, command: String) -> Self {
-        self.work = Some(command);
+    pub fn clone(mut self, command: String) -> Self {
+        self.clone = Some(command);
         self
     }
 
-    pub fn clone(mut self, command: String) -> Self {
-        self.clone = Some(command);
+    pub fn work(mut self, command: String) -> Self {
+        self.work = Some(command);
         self
     }
 
@@ -119,8 +134,8 @@ impl RepositoryBuilder {
             remotes: self.remotes,
             tags: self.tags,
             path: self.path,
-            work: self.work,
             clone: self.clone,
+            work: self.work,
             location: self.location,
             config,
         }

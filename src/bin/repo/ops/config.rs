@@ -95,6 +95,7 @@ impl ConfigCommand {
             "host" => println!("{}", config.host(location)),
             "ssh" => println!("{}", config.ssh_user(location)),
             "scheme" => println!("{}", config.scheme(location)),
+            "shell" => println!("{}", config.shell(location).join(" ")),
             "include" => {
                 for include in config.include_tags(location) {
                     println!("{}", include);
@@ -129,6 +130,7 @@ impl ConfigCommand {
                 let scheme = value.parse()?;
                 config.set_scheme(scheme, location);
             }
+            "shell" => config.set_shell(value, location),
             "include" => {
                 if self.remove {
                     if !config.remove_include_tag(value, location) {

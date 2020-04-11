@@ -100,6 +100,7 @@ impl Workspace {
 
         let use_cli = self.config.cli(None);
 
+        let mut was_cloned = false;
         if workspace_path.is_dir() {
             git::merge(&workspace_path, use_cli)?;
         } else {
@@ -107,13 +108,54 @@ impl Workspace {
                 repository.remotes.get(0).map(|r| &r.name).ok_or_else(|| {
                     anyhow!("Repository: {} does not have a remote", repository.name)
                 })?;
+
             let branch = format!("{}/master", remote_name);
+
             git::clone(
                 &workspace_path,
                 &branch,
                 repository.remotes.as_slice(),
                 use_cli,
             )?;
+
+            was_cloned = true;
+        }
+
+        if was_cloned {
+            trace!("path: {:#?}", workspace_path.display());
+            let mut after = Vec::new();
+            if let Some(clone) = &repository.clone {
+                after.push(clone.clone());
+            }
+            after
+                .extend_from_slice(&repository.resolve_from_tags(&self.cache, |t| t.clone.clone()));
+
+            let shell = self.config().shell(None);
+            let program = shell.first().ok_or_else(|| {
+                anyhow!("'shell' option in configuration must have at least one field")
+            })?;
+            let rest: &[&str] = shell.split_at(1).1;
+
+            // execute command
+            for cmd in after {
+                if cmd.is_empty() {
+                    return Err(anyhow!("after clone command is empty"));
+                }
+
+                let mut command = util::process::piped(program);
+                let status = util::process::execute_command(
+                    command
+                        .args(rest)
+                        .arg(&cmd)
+                        .current_dir(&workspace_path)
+                        .env("REPO_NAME", &repository.name),
+                    repository.name.to_owned(),
+                )?;
+
+                if !status.success() {
+                    return Err(anyhow!("External command failed: {}", &cmd));
+                }
+            }
         }
 
         Ok(())
