@@ -10,6 +10,7 @@ pub struct AddCommand {
     clone: Option<String>,
     work: Option<String>,
     local: bool,
+    cli: bool,
 }
 
 impl CliCommand for AddCommand {
@@ -90,6 +91,18 @@ impl CliCommand for AddCommand {
                     .takes_value(true)
                     .value_name("COMMAND")
             )
+            .arg(
+                Arg::with_name("cli")
+                    .help("Flag repository to interact with git through the command line")
+                    .long_help(
+                        "Flag repository to interact with git through the command line.\n\
+                        If for some reason git cannot access your remote repository you can specify a\n\
+                        repository to use the command line instead of libgit2. This mainly happens because\n\
+                        of authentication issues If you can get the command line to clone the repository\n\
+                        the repo will use that instead.")
+                    .long("cli")
+                    .short("u")
+            )
     }
 
     fn from_matches(m: &ArgMatches) -> Self {
@@ -103,6 +116,7 @@ impl CliCommand for AddCommand {
             clone: m.value_of("clone").map(String::from),
             work: m.value_of("work").map(String::from),
             local: m.is_present("local"),
+            cli: m.is_present("cli"),
         }
     }
 
@@ -140,6 +154,10 @@ impl CliCommand for AddCommand {
 
         if let Some(work) = self.work {
             builder = builder.work(work);
+        }
+
+        if self.cli {
+            builder = builder.cli(self.cli);
         }
 
         workspace.add_repository(builder.build())
