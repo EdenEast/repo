@@ -10,6 +10,7 @@ pub struct EditCommand {
     local: bool,
     global: bool,
     edit: bool,
+    cli: bool,
 }
 
 impl CliCommand for EditCommand {
@@ -56,6 +57,18 @@ impl CliCommand for EditCommand {
                     .short("p")
                     .takes_value(true)
             )
+            .arg(
+                Arg::with_name("cli")
+                    .help("Flag repository to interact with git through the command line")
+                    .long_help(
+                        "Flag repository to interact with git through the command line.\n\
+                        If for some reason git cannot access your remote repository you can specify a\n\
+                        repository to use the command line instead of libgit2. This mainly happens because\n\
+                        of authentication issues If you can get the command line to clone the repository\n\
+                        the repo will use that instead.")
+                    .long("cli")
+                    .short("u")
+            )
     }
 
     fn from_matches(m: &ArgMatches) -> Self {
@@ -68,6 +81,7 @@ impl CliCommand for EditCommand {
             local: m.is_present("local"),
             global: m.is_present("global"),
             edit: m.is_present("edit"),
+            cli: m.is_present("cli"),
         }
     }
 
@@ -80,6 +94,10 @@ impl CliCommand for EditCommand {
 
         if self.path.is_some() {
             repository.path = self.path.map(PathBuf::from);
+        }
+
+        if self.cli {
+            repository.use_cli = Some(self.cli);
         }
 
         if self.local || self.global {

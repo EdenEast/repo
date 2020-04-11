@@ -98,7 +98,7 @@ impl Workspace {
             .root(None)
             .join(repository.resolve_workspace_path());
 
-        let use_cli = self.config.cli(None);
+        let use_cli = repository.use_cli.unwrap_or_else(|| self.config.cli(None));
 
         let mut was_cloned = false;
         if workspace_path.is_dir() {

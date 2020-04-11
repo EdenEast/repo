@@ -12,6 +12,7 @@ pub struct Repository {
     pub path: Option<PathBuf>,
     pub work: Option<String>,
     pub clone: Option<String>,
+    pub use_cli: Option<bool>,
 
     pub tags: BTreeSet<String>,
     pub remotes: Vec<Remote>,
@@ -31,6 +32,7 @@ pub struct RepositoryBuilder {
     path: Option<PathBuf>,
     work: Option<String>,
     clone: Option<String>,
+    use_cli: Option<bool>,
 }
 
 impl Repository {
@@ -89,6 +91,7 @@ impl RepositoryBuilder {
             remotes: Vec::new(),
             tags: BTreeSet::new(),
             location: Location::default(),
+            use_cli: None,
             path: None,
             work: None,
             clone: None,
@@ -115,6 +118,11 @@ impl RepositoryBuilder {
         self
     }
 
+    pub fn cli(mut self, use_cli: bool) -> Self {
+        self.use_cli = Some(use_cli);
+        self
+    }
+
     pub fn clone(mut self, command: String) -> Self {
         self.clone = Some(command);
         self
@@ -136,6 +144,7 @@ impl RepositoryBuilder {
             path: self.path,
             clone: self.clone,
             work: self.work,
+            use_cli: self.use_cli,
             location: self.location,
             config,
         }
