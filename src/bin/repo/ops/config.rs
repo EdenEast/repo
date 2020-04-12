@@ -1,6 +1,6 @@
 use super::CliCommand;
 use anyhow::Result;
-use clap::{App, Arg, ArgMatches, SubCommand};
+use clap::{App, AppSettings, Arg, ArgMatches, SubCommand};
 use repo::prelude::*;
 use std::{path::PathBuf, str::FromStr};
 
@@ -18,6 +18,7 @@ pub struct ConfigCommand {
 impl CliCommand for ConfigCommand {
     fn app<'a, 'b: 'a>(app: App<'a, 'b>) -> App<'a, 'b> {
         app.about("Get or set configuration options")
+            .settings(&[AppSettings::NextLineHelp])
             .arg(Arg::with_name("NAME").help("Name of configuration option"))
             .arg(
                 Arg::with_name("VALUE")

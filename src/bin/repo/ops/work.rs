@@ -11,7 +11,7 @@ pub struct WorkCommand {
 impl CliCommand for WorkCommand {
     fn app<'a, 'b: 'a>(app: App<'a, 'b>) -> App<'a, 'b> {
         app.about("Generate work command for a repostory")
-            .setting(AppSettings::Hidden)
+            .settings(&[AppSettings::Hidden, AppSettings::NextLineHelp])
             .arg(
                 Arg::with_name("NAME")
                     .help("Name of the tracked repository to be worked on")

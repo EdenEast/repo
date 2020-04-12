@@ -1,6 +1,6 @@
 use super::CliCommand;
 use anyhow::{anyhow, bail, Result};
-use clap::{values_t, App, Arg, ArgMatches};
+use clap::{values_t, App, AppSettings, Arg, ArgMatches};
 use repo::prelude::*;
 
 pub struct AddCommand {
@@ -19,15 +19,16 @@ pub struct AddCommand {
 impl CliCommand for AddCommand {
     fn app<'a, 'b: 'a>(app: App<'a, 'b>) -> App<'a, 'b> {
         app.about("Add a repository to be tracked by repo")
+            .settings(&[AppSettings::NextLineHelp])
             .arg(
                 Arg::with_name("URL")
                     .help("A url link to the repository's remote origin.")
                     .long_help(
                         "A url link to the repository's remote origin.\n\
-                        Url can be represented by the following specifications:\n\n  \
+                        Url can be represented by the following specifications:\n  \
                         * <scheme>://[<username>[:<password>]@]<host>/<path-to-repo>.git\n    \
                         - Available schemes are: `http[s]`, `ssh` and `git`.\n    \
-                        - Example: https://github.com/user/repo\n\n  \
+                        - Example: https://github.com/user/repo\n  \
                         * <username>@<host>:<path-to-repo>\n    \
                         - Equivalent to `ssh://<username>@<host>/<path-to-repo>.git`\n    \
                         - Example: git@github.com:user/repo\n  \

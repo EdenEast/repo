@@ -1,6 +1,6 @@
 use super::CliCommand;
 use anyhow::Result;
-use clap::{App, Arg, ArgMatches};
+use clap::{App, AppSettings, Arg, ArgMatches};
 use repo::prelude::*;
 
 pub struct ListCommand {
@@ -11,6 +11,7 @@ pub struct ListCommand {
 impl CliCommand for ListCommand {
     fn app<'a, 'b: 'a>(app: App<'a, 'b>) -> App<'a, 'b> {
         app.about("List repositories tracked by repo")
+            .settings(&[AppSettings::NextLineHelp])
             .arg(
                 Arg::with_name("local")
                     .help("Show only local repositories")

@@ -1,6 +1,6 @@
 use super::CliCommand;
 use anyhow::{anyhow, bail, Result};
-use clap::{values_t, App, Arg, ArgMatches};
+use clap::{values_t, App, AppSettings, Arg, ArgMatches};
 use repo::prelude::*;
 use std::path::PathBuf;
 
@@ -18,6 +18,7 @@ pub struct EditCommand {
 impl CliCommand for EditCommand {
     fn app<'a, 'b: 'a>(app: App<'a, 'b>) -> App<'a, 'b> {
         app.about("Edit a repository tracked by repo")
+            .settings(&[AppSettings::NextLineHelp])
             .arg(
                 Arg::with_name("NAME")
                     .help("Name of the repository to be edited")

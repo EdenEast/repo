@@ -1,6 +1,6 @@
 use super::CliCommand;
 use anyhow::Result;
-use clap::{values_t, App, Arg, ArgMatches};
+use clap::{values_t, App, AppSettings, Arg, ArgMatches};
 use repo::prelude::*;
 
 pub struct UpdateCommand {
@@ -12,6 +12,7 @@ pub struct UpdateCommand {
 impl CliCommand for UpdateCommand {
     fn app<'a, 'b: 'a>(app: App<'a, 'b>) -> App<'a, 'b> {
         app.about("Update tracked repositories in repo with their remotes")
+            .settings(&[AppSettings::NextLineHelp])
             .arg(
                 Arg::with_name("local")
                     .help("Perform operation on only local repositories")
