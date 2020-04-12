@@ -1,5 +1,5 @@
 use super::CliCommand;
-use anyhow::{anyhow, Result};
+use anyhow::{anyhow, bail, Result};
 use clap::{values_t, App, Arg, ArgMatches};
 use repo::prelude::*;
 
@@ -8,6 +8,7 @@ pub struct AddCommand {
     name: Option<String>,
     path: Option<String>,
     tags: Option<Vec<String>>,
+    remotes: Option<Vec<String>>,
     clone: Option<String>,
     work: Option<String>,
     local: bool,
@@ -68,7 +69,7 @@ impl CliCommand for AddCommand {
                     .takes_value(true)
                     .multiple(true)
                     .number_of_values(1)
-                    .value_name("TAG")
+                    .value_name("tag")
                 )
             .arg(
                 Arg::with_name("path")
@@ -93,7 +94,7 @@ impl CliCommand for AddCommand {
                     .long("clone")
                     .short("c")
                     .takes_value(true)
-                    .value_name("COMMAND")
+                    .value_name("command")
             )
             .arg(
                 Arg::with_name("work")
@@ -105,7 +106,22 @@ impl CliCommand for AddCommand {
                     .long("work")
                     .short("w")
                     .takes_value(true)
-                    .value_name("COMMAND")
+                    .value_name("command")
+            )
+            .arg(
+                Arg::with_name("remote")
+                    .help("Add an additional remote")
+                    .long_help(
+                        "Add an additional remote. Remote will be appened to the repository as an additional remote\n\
+                        This is useful if the repository is a fork, letting you link to the upstream remote.\n\
+                        Repo uses the first remote in it's list as the default remote. By convention the\n\
+                        first remote is 'origin'. Remote's argument format is name and url seperated by a ','")
+                    .long("remote")
+                    .short("r")
+                    .takes_value(true)
+                    .multiple(true)
+                    .number_of_values(1)
+                    .value_name("name,url")
             )
             .arg(
                 Arg::with_name("force")
@@ -134,6 +150,7 @@ impl CliCommand for AddCommand {
                 .map(String::from)
                 .expect("URL is a required argument"),
             tags: values_t!(m, "tag", String).ok(),
+            remotes: values_t!(m, "remote", String).ok(),
             name: m.value_of("NAME").map(String::from),
             path: m.value_of("path").map(String::from),
             clone: m.value_of("clone").map(String::from),
@@ -182,6 +199,23 @@ impl CliCommand for AddCommand {
         if let Some(tags) = self.tags {
             for tag in tags {
                 builder = builder.tag(tag);
+            }
+        }
+
+        if let Some(remotes) = self.remotes {
+            for arg in remotes {
+                let split: Vec<&str> = arg.splitn(2, ',').collect();
+                if split.len() != 2 {
+                    bail!(
+                        "could not parse name, url from remote argument: '{}', len: {:#?}",
+                        arg,
+                        split
+                    );
+                }
+
+                let q = Query::parse(split[1])?;
+                let remote = Remote::with_name(split[0], q.to_url(&workspace.config()));
+                builder = builder.remote(remote);
             }
         }
 

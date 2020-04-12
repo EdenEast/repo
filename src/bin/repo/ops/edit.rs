@@ -1,5 +1,5 @@
 use super::CliCommand;
-use anyhow::{anyhow, Result};
+use anyhow::{anyhow, bail, Result};
 use clap::{values_t, App, Arg, ArgMatches};
 use repo::prelude::*;
 use std::path::PathBuf;
@@ -8,6 +8,7 @@ pub struct EditCommand {
     name: String,
     path: Option<String>,
     tags: Option<Vec<String>>,
+    remotes: Option<Vec<String>>,
     local: bool,
     global: bool,
     edit: bool,
@@ -57,7 +58,7 @@ impl CliCommand for EditCommand {
                     .takes_value(true)
                     .multiple(true)
                     .number_of_values(1)
-                    .value_name("TAG")
+                    .value_name("tag")
                 )
             .arg(
                 Arg::with_name("path")
@@ -71,7 +72,22 @@ impl CliCommand for EditCommand {
                     .long("path")
                     .short("p")
                     .takes_value(true)
-                    .value_name("PATH")
+                    .value_name("path")
+            )
+            .arg(
+                Arg::with_name("remote")
+                    .help("Add an additional remote")
+                    .long_help(
+                        "Add an additional remote. Remote will be appened to the repository as an additional remote\n\
+                        This is useful if the repository is a fork, letting you link to the upstream remote.\n\
+                        Repo uses the first remote in it's list as the default remote. By convention the\n\
+                        first remote is 'origin'. Remote's argument format is name and url seperated by a ','")
+                    .long("remote")
+                    .short("r")
+                    .takes_value(true)
+                    .multiple(true)
+                    .number_of_values(1)
+                    .value_name("name,url")
             )
             .arg(
                 Arg::with_name("cli")
@@ -94,6 +110,7 @@ impl CliCommand for EditCommand {
                 .map(String::from)
                 .expect("NAME is a required argument"),
             tags: values_t!(m, "tag", String).ok(),
+            remotes: values_t!(m, "remote", String).ok(),
             path: m.value_of("path").map(String::from),
             local: m.is_present("local"),
             global: m.is_present("global"),
@@ -120,6 +137,27 @@ impl CliCommand for EditCommand {
         if let Some(tags) = self.tags {
             for tag in tags {
                 repository.tags.insert(tag);
+            }
+        }
+
+        if let Some(remotes) = self.remotes {
+            for arg in remotes {
+                let split: Vec<&str> = arg.splitn(2, ',').collect();
+                if split.len() != 2 {
+                    bail!(
+                        "could not parse name, url from remote argument: '{}', len: {:#?}",
+                        arg,
+                        split
+                    );
+                }
+
+                let q = Query::parse(split[1])?;
+                let remote = Remote::with_name(split[0], q.to_url(&workspace.config()));
+                if repository.remotes.iter().any(|r| r.name == remote.name) {
+                    bail!("remote name: {} already exists in repository", remote.name);
+                }
+
+                repository.remotes.push(remote);
             }
         }
 
