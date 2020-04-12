@@ -78,15 +78,15 @@ impl ConfigData {
 
     fn to_raw(&self) -> RawConfigData {
         let include = if self.include.is_empty() {
-            Some(self.include.iter().cloned().collect())
-        } else {
             None
+        } else {
+            Some(self.include.iter().cloned().collect())
         };
 
-        let exclude = if self.include.is_empty() {
-            Some(self.exclude.iter().cloned().collect())
-        } else {
+        let exclude = if self.exclude.is_empty() {
             None
+        } else {
+            Some(self.exclude.iter().cloned().collect())
         };
 
         let shell = match &self.shell {

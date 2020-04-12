@@ -6,6 +6,7 @@ use repo::prelude::*;
 pub struct UpdateCommand {
     local: bool,
     global: bool,
+    all: bool,
     tags: Option<Vec<String>>,
 }
 
@@ -49,6 +50,7 @@ impl CliCommand for UpdateCommand {
         Self {
             local: m.is_present("local"),
             global: m.is_present("global"),
+            all: m.is_present("all"),
             tags: values_t!(m, "tag", String).ok(),
         }
     }
@@ -56,20 +58,19 @@ impl CliCommand for UpdateCommand {
     fn run(self, _: &ArgMatches) -> Result<()> {
         let workspace = Workspace::new()?;
 
-        let mut repositories = match (self.global, self.local) {
-            (true, false) => workspace
-                .cache()
+        let mut repositories = match (self.global, self.local, self.all) {
+            (true, false, false) => workspace
                 .repositories()
                 .into_iter()
                 .filter(|r| r.location == Location::Global)
                 .collect(),
-            (false, true) => workspace
-                .cache()
+            (false, true, false) => workspace
                 .repositories()
                 .into_iter()
                 .filter(|r| r.location == Location::Local)
                 .collect(),
-            _ => workspace.cache().repositories(),
+            (false, false, true) => workspace.cache().repositories(),
+            _ => workspace.repositories(),
         };
 
         if let Some(tags) = self.tags {
