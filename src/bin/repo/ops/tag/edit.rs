@@ -1,6 +1,6 @@
 use crate::ops::CliCommand;
 use anyhow::{anyhow, Result};
-use clap::{App, Arg, ArgMatches};
+use clap::{App, AppSettings, Arg, ArgMatches};
 use repo::prelude::*;
 use std::path::PathBuf;
 
@@ -15,6 +15,7 @@ pub struct EditCommand {
 impl CliCommand for EditCommand {
     fn app<'a, 'b: 'a>(app: App<'a, 'b>) -> App<'a, 'b> {
         app.about("Edit a tag stored in repo")
+            .settings(&[AppSettings::NextLineHelp])
             .arg(
                 Arg::with_name("NAME")
                     .help("Name of the repository to be edited")

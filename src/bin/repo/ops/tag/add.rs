@@ -1,6 +1,6 @@
 use crate::ops::CliCommand;
 use anyhow::Result;
-use clap::{App, Arg, ArgMatches};
+use clap::{App, AppSettings, Arg, ArgMatches};
 use repo::{Location, TagBuilder, Workspace};
 
 pub struct AddCommand {
@@ -14,6 +14,7 @@ pub struct AddCommand {
 impl CliCommand for AddCommand {
     fn app<'a, 'b: 'a>(app: App<'a, 'b>) -> App<'a, 'b> {
         app.about("Add a tag to repo")
+            .settings(&[AppSettings::NextLineHelp])
             .arg(
                 Arg::with_name("NAME")
                     .help("Name of the tag")

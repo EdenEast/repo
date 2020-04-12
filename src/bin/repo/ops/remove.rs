@@ -1,6 +1,6 @@
 use super::CliCommand;
 use anyhow::Result;
-use clap::{values_t, App, Arg, ArgMatches};
+use clap::{values_t, App, AppSettings, Arg, ArgMatches};
 use dialoguer::Confirmation;
 use repo::prelude::*;
 
@@ -12,6 +12,7 @@ pub struct RemoveCommand {
 impl CliCommand for RemoveCommand {
     fn app<'a, 'b: 'a>(app: App<'a, 'b>) -> App<'a, 'b> {
         app.about("Remove a repository tracked by repo")
+            .settings(&[AppSettings::NextLineHelp])
             .arg(
                 Arg::with_name("NAME")
                     .help("Name of repository")

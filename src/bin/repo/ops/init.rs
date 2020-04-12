@@ -10,7 +10,7 @@ pub struct InitCommand {
 impl CliCommand for InitCommand {
     fn app<'a, 'b: 'a>(app: App<'a, 'b>) -> App<'a, 'b> {
         app.about("Prints the shell function used to integrate repo with shell")
-            .setting(AppSettings::Hidden)
+            .settings(&[AppSettings::Hidden, AppSettings::NextLineHelp])
             .arg(
                 Arg::with_name("SHELL")
                     .help("Name of the shell the shell function will generate")

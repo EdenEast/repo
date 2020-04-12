@@ -1,6 +1,6 @@
 use super::CliCommand;
 use anyhow::{anyhow, Result};
-use clap::{values_t, App, Arg, ArgMatches};
+use clap::{values_t, App, AppSettings, Arg, ArgMatches};
 use repo::{prelude::*, util::process};
 
 pub struct ForeachCommand {
@@ -13,6 +13,7 @@ pub struct ForeachCommand {
 impl CliCommand for ForeachCommand {
     fn app<'a, 'b: 'a>(app: App<'a, 'b>) -> App<'a, 'b> {
         app.about("Execute command for every tracked repository")
+            .settings(&[AppSettings::NextLineHelp])
             .arg(
                 Arg::with_name("CMD")
                     .help("Shell command to be executed")
