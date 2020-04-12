@@ -89,6 +89,15 @@ impl Config {
         &*LOCAL_CONFIG_PATH
     }
 
+    pub fn path(&self, location: Option<Location>) -> &Path {
+        if let Some(l) = location {
+            if l == Location::Local {
+                return self.local.path.as_ref().unwrap();
+            }
+        }
+
+        self.global.path.as_ref().unwrap()
+    }
     // --------------------------------------------------------------------------------------------
     // Get functions for config command
 

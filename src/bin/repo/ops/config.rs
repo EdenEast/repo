@@ -10,6 +10,7 @@ pub struct ConfigCommand {
     local: bool,
     global: bool,
     remove: bool,
+    edit: bool,
 }
 
 impl CliCommand for ConfigCommand {
@@ -41,6 +42,15 @@ impl CliCommand for ConfigCommand {
                     .long("rm")
                     .short("r"),
             )
+            .arg(
+                Arg::with_name("edit")
+                    .help("Open cache file in $EDITOR")
+                    .long("edit")
+                    .short("e")
+                    .long_help(
+                        "Open cache file in $EDITOR. If $EDITOR is not defined will open in vim",
+                    ),
+            )
     }
 
     fn from_matches(m: &ArgMatches) -> Self {
@@ -50,17 +60,43 @@ impl CliCommand for ConfigCommand {
             local: m.is_present("local"),
             global: m.is_present("global"),
             remove: m.is_present("remove"),
+            edit: m.is_present("edit"),
         }
     }
 
     fn run(self, _: &ArgMatches) -> Result<()> {
         let mut workspace = Workspace::new()?;
+        let config = workspace.config_mut();
+        let location = match (self.local, self.global) {
+            (true, false) => Some(Location::Local),
+            (false, true) => Some(Location::Global),
+            _ => None,
+        };
 
         match (self.name.as_ref(), self.value.as_ref()) {
-            (Some(name), Some(value)) => self.set_value(name, value, workspace.config_mut()),
-            (Some(name), None) => self.get_value(name, workspace.config_mut()),
-            _ => self.no_value(workspace.config()),
+            (Some(name), Some(value)) => self.set_value(name, value, config)?,
+            (Some(name), None) => self.get_value(name, config)?,
+            _ => self.no_value(config)?,
+        };
+
+        if self.edit {
+            let path = config.path(location).join("config.toml");
+            let editor = std::env::var("EDITOR").unwrap_or_else(|_| String::from("vim"));
+            let status = repo::util::process::inherit(&editor).arg(&path).status()?;
+
+            if !status.success() {
+                let code = status.code().unwrap_or(1);
+                eprintln!(
+                    "Process: '{} {}' failed with error code: {}",
+                    editor,
+                    &path.display(),
+                    code
+                );
+                std::process::exit(code);
+            }
         }
+
+        Ok(())
     }
 }
 
@@ -79,7 +115,11 @@ impl ConfigCommand {
     }
 
     fn no_value(&self, _config: &Config) -> Result<()> {
-        ConfigCommand::print_help(false)
+        if !self.edit {
+            ConfigCommand::print_help(false)?;
+        }
+
+        Ok(())
     }
 
     fn get_value(&self, name: &str, config: &Config) -> Result<()> {
