@@ -179,10 +179,10 @@ impl CliCommand for AddCommand {
             Location::Global
         };
 
-        if workspace.get_repository(&name).is_some() {
+        if workspace.has_repository(&name) {
             if !self.force {
                 return Err(anyhow!(
-                    "repository: {} already exist in repo, --force to override",
+                    "'{}' already exist in repo. If not visible 'list' then check config filters. --force to override",
                     &name
                 ));
             } else {

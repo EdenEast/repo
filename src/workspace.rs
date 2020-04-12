@@ -28,6 +28,28 @@ impl Workspace {
         &mut self.config
     }
 
+    pub fn filter_repository(&self, repository: &Repository) -> bool {
+        let include = self.config.include_tags(None);
+        if !include.is_empty() && !include.into_iter().any(|e| repository.tags.contains(e)) {
+            return false;
+        }
+
+        let exclude = self.config.exclude_tags(None);
+        if !exclude.is_empty() && exclude.into_iter().any(|e| repository.tags.contains(e)) {
+            return false;
+        }
+
+        true
+    }
+
+    pub fn repositories(&self) -> Vec<&Repository> {
+        self.cache
+            .repositories()
+            .into_iter()
+            .filter(|r| self.filter_repository(r))
+            .collect()
+    }
+
     /// Adds a repository to the cache
     /// Adding a repository to the cache will also write the repository to disk
     pub fn add_repository(&mut self, repository: Repository) -> Result<()> {
@@ -59,11 +81,23 @@ impl Workspace {
     }
 
     pub fn get_repository(&self, name: &str) -> Option<&Repository> {
-        self.cache.get_repository(&name)
+        if let Some(repo) = self.cache.get_repository(&name) {
+            if self.filter_repository(&repo) {
+                return Some(repo);
+            }
+        }
+
+        None
     }
 
     pub fn take_repository(&mut self, name: &str) -> Option<Repository> {
-        self.cache.take_repository(&name)
+        if let Some(repo) = self.cache.take_repository(&name) {
+            if self.filter_repository(&repo) {
+                return Some(repo);
+            }
+        }
+
+        None
     }
 
     pub fn get_tag(&mut self, name: &str) -> Option<&Tag> {

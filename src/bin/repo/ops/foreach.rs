@@ -8,6 +8,7 @@ pub struct ForeachCommand {
     tags: Option<Vec<String>>,
     local: bool,
     global: bool,
+    all: bool,
 }
 
 impl CliCommand for ForeachCommand {
@@ -61,26 +62,26 @@ impl CliCommand for ForeachCommand {
             tags: values_t!(m, "tag", String).ok(),
             local: m.is_present("local"),
             global: m.is_present("global"),
+            all: m.is_present("all"),
         }
     }
 
     fn run(self, _: &ArgMatches) -> Result<()> {
         let workspace = Workspace::new()?;
 
-        let mut repositories = match (self.global, self.local) {
-            (true, false) => workspace
-                .cache()
+        let mut repositories = match (self.global, self.local, self.all) {
+            (true, false, false) => workspace
                 .repositories()
                 .into_iter()
                 .filter(|r| r.location == Location::Global)
                 .collect(),
-            (false, true) => workspace
-                .cache()
+            (false, true, false) => workspace
                 .repositories()
                 .into_iter()
                 .filter(|r| r.location == Location::Local)
                 .collect(),
-            _ => workspace.cache().repositories(),
+            (false, false, true) => workspace.cache().repositories(),
+            _ => workspace.repositories(),
         };
 
         if let Some(tags) = self.tags {
