@@ -11,6 +11,8 @@ pub struct ConfigCommand {
     global: bool,
     remove: bool,
     edit: bool,
+    list: bool,
+    name_only: bool,
 }
 
 impl CliCommand for ConfigCommand {
@@ -45,11 +47,23 @@ impl CliCommand for ConfigCommand {
             .arg(
                 Arg::with_name("edit")
                     .help("Open cache file in $EDITOR")
-                    .long("edit")
-                    .short("e")
                     .long_help(
                         "Open cache file in $EDITOR. If $EDITOR is not defined will open in vim",
-                    ),
+                    )
+                    .long("edit")
+                    .short("e"),
+            )
+            .arg(
+                Arg::with_name("list")
+                    .help("List all config options and values")
+                    .long("list")
+                    .short("s"),
+            )
+            .arg(
+                Arg::with_name("name-only")
+                    .help("List only config option names")
+                    .long("name-only")
+                    .short("n"),
             )
     }
 
@@ -61,6 +75,8 @@ impl CliCommand for ConfigCommand {
             global: m.is_present("global"),
             remove: m.is_present("remove"),
             edit: m.is_present("edit"),
+            list: m.is_present("list"),
+            name_only: m.is_present("name-only"),
         }
     }
 
@@ -96,6 +112,30 @@ impl CliCommand for ConfigCommand {
             }
         }
 
+        if self.list || self.name_only {
+            let options: Vec<(&str, String)> = vec![
+                ("root", format!("{}", config.root(location).display())),
+                ("cli", config.cli(location).to_string()),
+                ("host", config.host(location).to_owned()),
+                ("ssh", config.ssh_user(location).to_owned()),
+                ("scheme", format!("{}", config.scheme(location))),
+                ("shell", config.shell(location).join(" ")),
+                ("include", format!("{:#?}", config.include_tags(location))),
+                ("exclude", format!("{:#?}", config.exclude_tags(location))),
+            ];
+
+            if self.name_only {
+                for (name, _) in options {
+                    println!("{}", name);
+                }
+                return Ok(());
+            }
+
+            for (name, value) in options {
+                println!("{:>7} = {}", name, value);
+            }
+        }
+
         Ok(())
     }
 }
@@ -115,7 +155,7 @@ impl ConfigCommand {
     }
 
     fn no_value(&self, _config: &Config) -> Result<()> {
-        if !self.edit {
+        if !self.edit && !self.list && !self.name_only {
             ConfigCommand::print_help(false)?;
         }
 
