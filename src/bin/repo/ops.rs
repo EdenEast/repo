@@ -1,12 +1,12 @@
 use anyhow::Result;
 use clap::{
     app_from_crate, crate_authors, crate_description, crate_name, crate_version, App, AppSettings,
-    ArgMatches, SubCommand,
+    Arg, ArgMatches, SubCommand,
 };
 
 macro_rules! define_app {
     ($( $name:expr => [$t:ty: $aliases:expr], )*) => {
-        fn app<'a, 'b: 'a>() -> App<'a, 'b> {
+        pub fn app<'a, 'b: 'a>() -> App<'a, 'b> {
             app_from_crate!()
                 .bin_name(crate_name!()) // stop windows from adding .exe
                 .max_term_width(100)
@@ -15,16 +15,35 @@ macro_rules! define_app {
                     AppSettings::ColoredHelp,
                     AppSettings::UnifiedHelpMessage,
                     AppSettings::VersionlessSubcommands,
-                    AppSettings::SubcommandRequiredElseHelp,
                 ])
+                .arg(Arg::with_name("list-commands-option").help("List installed commands").long("list"))
                 $( .subcommand(<$t>::app(SubCommand::with_name($name)).aliases($aliases)) )*
+        }
+
+        pub fn commands<'a, 'b: 'a>() -> Vec<App<'a, 'b>> {
+            vec![
+                $( <$t>::app(SubCommand::with_name($name)).aliases($aliases), )*
+            ]
         }
 
         pub fn run() -> Result<()> {
             let matches = app().get_matches();
+            if matches.is_present("list-commands-option") {
+                for cmd in list_commands() {
+                    let summary = cmd.about.unwrap_or_default();
+                    let summary = summary.lines().next().unwrap_or(&summary); // display only the first line
+                    println!("{:>15}    {}", cmd.name, summary);
+                }
+                return Ok(());
+            }
+
             match matches.subcommand() {
                 $( ($name, Some(m)) => <$t>::from_matches(m).run(m), )*
-                _ => unreachable!(),
+                _ => {
+                    app().print_help()?;
+                    println!("");
+                    Ok(())
+                }
             }
         }
     }
@@ -59,3 +78,20 @@ mod remove;
 mod tag;
 mod update;
 mod work;
+
+struct CommandInfo {
+    pub name: String,
+    pub about: Option<String>,
+}
+
+fn list_commands() -> Vec<CommandInfo> {
+    let commands = commands();
+    let mut result = Vec::with_capacity(commands.len());
+    for cmd in commands {
+        result.push(CommandInfo {
+            name: cmd.get_name().to_string(),
+            about: cmd.p.meta.about.map(|s| s.to_string()),
+        })
+    }
+    result
+}
