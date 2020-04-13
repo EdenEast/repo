@@ -10,3 +10,5 @@ function work
   set -l script (repo work $argv)
   __fish_repo_use_internal $status $script
 end
+
+complete -c work -f -xa "(repo list)"
