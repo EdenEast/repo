@@ -1,3 +1,5 @@
 pub fn init() -> String {
-    include_str!("work.fish").to_owned()
+    let completion = include_str!("completion.fish");
+    let work = include_str!("work.fish");
+    format!("{}\n{}", completion, work)
 }
