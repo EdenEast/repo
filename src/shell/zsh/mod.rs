@@ -1,3 +1,5 @@
 pub fn init() -> String {
-    include_str!("work.zsh").to_owned()
+    let completion = include_str!("completion.zsh");
+    let work = include_str!("work.zsh");
+    format!("{}\n{}", completion, work)
 }
