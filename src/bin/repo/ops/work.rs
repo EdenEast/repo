@@ -48,7 +48,7 @@ impl CliCommand for WorkCommand {
         let path = workspace
             .config()
             .root(None)
-            .join(repo.resolve_workspace_path());
+            .join(repo.resolve_workspace_path(workspace.cache()));
 
         if !path.is_dir() {
             return Err(anyhow!("Could not find repository: '{}' in workspace path: '{}'. Repository needs to be cloned.", self.name, path.display()));

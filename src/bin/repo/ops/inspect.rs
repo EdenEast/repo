@@ -63,7 +63,7 @@ impl CliCommand for InspectCommand {
         let workspace = workspace
             .config()
             .root(None)
-            .join(repository.resolve_workspace_path());
+            .join(repository.resolve_workspace_path(workspace.cache()));
         let tags = repository
             .tags
             .iter()

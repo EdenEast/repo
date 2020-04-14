@@ -1,5 +1,5 @@
 use super::CliCommand;
-use anyhow::{anyhow, Result};
+use anyhow::{anyhow, Context, Result};
 use clap::{values_t, App, AppSettings, Arg, ArgMatches};
 use repo::{prelude::*, util::process};
 
@@ -112,19 +112,27 @@ impl CliCommand for ForeachCommand {
 
         let workspace_root = workspace.config().root(None);
         for repository in repositories {
-            let cwd = workspace_root.join(repository.resolve_workspace_path());
+            let cwd = workspace_root.join(repository.resolve_workspace_path(workspace.cache()));
             let name = repository.name.as_str();
 
             let cmd = self.cmd.to_owned();
+            trace!("exec: '{}' in: {:#?}", cmd, cwd);
             let mut command = process::piped(program);
             let status = process::execute_command(
                 command
                     .args(rest)
                     .arg(&cmd)
-                    .current_dir(cwd)
+                    .current_dir(&cwd)
                     .env("REPO_NAME", name),
                 name.to_owned(),
-            )?;
+            )
+            .context(format!(
+                "executing cmd: '{} {} {}' at '{}' failed",
+                program,
+                rest.join(" "),
+                cmd,
+                cwd.display()
+            ))?;
 
             if !status.success() {
                 return Err(anyhow!("External command failed: {}", self.cmd));

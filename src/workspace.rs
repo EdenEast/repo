@@ -130,7 +130,7 @@ impl Workspace {
         let workspace_path = self
             .config
             .root(None)
-            .join(repository.resolve_workspace_path());
+            .join(repository.resolve_workspace_path(self.cache()));
 
         let use_cli = repository.use_cli.unwrap_or_else(|| self.config.cli(None));
 
@@ -171,6 +171,7 @@ impl Workspace {
             let rest: &[&str] = shell.split_at(1).1;
 
             // execute command
+            trace!("Executing commands: {:#?}", after);
             for cmd in after {
                 if cmd.is_empty() {
                     return Err(anyhow!("after clone command is empty"));
@@ -184,7 +185,14 @@ impl Workspace {
                         .current_dir(&workspace_path)
                         .env("REPO_NAME", &repository.name),
                     repository.name.to_owned(),
-                )?;
+                )
+                .context(format!(
+                    "executing cmd: '{} {} {}' at '{}' failed",
+                    program,
+                    rest.join(" "),
+                    cmd,
+                    workspace_path.display()
+                ))?;
 
                 if !status.success() {
                     return Err(anyhow!("External command failed: {}", &cmd));

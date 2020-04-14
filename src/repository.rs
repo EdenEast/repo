@@ -36,10 +36,15 @@ pub struct RepositoryBuilder {
 }
 
 impl Repository {
-    pub fn resolve_workspace_path(&self) -> PathBuf {
+    pub fn resolve_workspace_path(&self, cache: &Cache) -> PathBuf {
         self.path
             .as_ref()
             .map(|s| s.join(&self.name))
+            .or_else(|| {
+                self.resolve_from_tags(cache, |tag| tag.path.clone())
+                    .pop()
+                    .map(|p| p.join(&self.name))
+            })
             .unwrap_or_else(|| PathBuf::from(&self.name))
     }
 
@@ -50,12 +55,12 @@ impl Repository {
         }
     }
 
-    pub fn resolve_from_tags<F>(&self, cache: &Cache, resolver: F) -> Vec<String>
+    pub fn resolve_from_tags<F, T>(&self, cache: &Cache, resolver: F) -> Vec<T>
     where
-        F: Fn(&Tag) -> Option<String>,
+        F: Fn(&Tag) -> Option<T>,
     {
         let tags = cache.tags();
-        let mut priority: Vec<(String, i32)> = tags
+        let mut priority: Vec<(T, i32)> = tags
             .iter()
             .filter(|t| self.tags.contains(&t.name))
             .flat_map(|t| resolver(t).map(|value| (value, t.priority.unwrap_or(50))))

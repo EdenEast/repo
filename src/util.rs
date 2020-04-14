@@ -40,7 +40,7 @@ where
 }
 
 pub mod process {
-    use anyhow::Result;
+    use anyhow::{Context, Result};
     use std::{
         io::{BufRead, BufReader},
         process::{Command, ExitStatus, Stdio},
@@ -71,7 +71,9 @@ pub mod process {
     }
 
     pub fn execute_command(command: &mut Command, prefix: String) -> Result<ExitStatus> {
-        let mut child = command.spawn()?;
+        let mut child = command
+            .spawn()
+            .context("failed executing command as a child process")?;
 
         let stdout_child = if let Some(stdout) = child.stdout.take() {
             let pre = prefix.clone();
@@ -81,7 +83,7 @@ pub mod process {
         };
 
         if let Some(stderr) = child.stderr.take() {
-            forward_stdout(stderr, &prefix)?;
+            forward_stdout(stderr, &prefix).context("could not forward stderr to stdout")?;
         }
 
         if let Some(child_thread) = stdout_child {
@@ -100,7 +102,9 @@ pub mod process {
         let mut buffer = BufReader::new(read);
         loop {
             let mut line = String::new();
-            let result = buffer.read_line(&mut line)?;
+            let result = buffer
+                .read_line(&mut line)
+                .context("could not read buffered line")?;
             if result == 0 {
                 break;
             }
