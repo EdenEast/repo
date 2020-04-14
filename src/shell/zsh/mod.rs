@@ -1,5 +1,10 @@
-pub fn init() -> String {
+pub fn init(fzf: bool) -> String {
     let completion = include_str!("completion.zsh");
-    let work = include_str!("work.zsh");
+    let work = if fzf {
+        include_str!("fzf.zsh")
+    } else {
+        include_str!("work.zsh")
+    };
+
     format!("{}\n{}", completion, work)
 }
