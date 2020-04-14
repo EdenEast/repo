@@ -6,3 +6,14 @@ function work()
   esac
   [ $? -eq 0 ] && eval "$SCRIPT" || printf "$SCRIPT"
 }
+
+function _work()
+{
+  local repos
+  repo list | while read line; do
+    repos+=( $line )
+  done
+  _describe -f repositories 'repository names' repos
+}
+
+compdef _work work
