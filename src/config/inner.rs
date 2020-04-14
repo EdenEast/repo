@@ -355,7 +355,7 @@ impl Config {
 
     pub fn set_shell(&mut self, shell: &str, location: Option<Location>) {
         let split = shell.split_whitespace();
-        let list: HashSet<String> = split.map(String::from).collect();
+        let list: Vec<String> = split.map(String::from).collect();
 
         if let Some(l) = location {
             if l == Location::Local {

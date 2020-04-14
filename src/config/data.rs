@@ -22,9 +22,9 @@ lazy_static! {
 
 impl Default for ConfigData {
     fn default() -> Self {
-        let mut shell = HashSet::with_capacity(2);
-        shell.insert(String::from("sh"));
-        shell.insert(String::from("-c"));
+        let mut shell = Vec::with_capacity(2);
+        shell.push(String::from("sh"));
+        shell.push(String::from("-c"));
 
         Self {
             root: Some((*DEFAULT_ROOT).to_path_buf()),
@@ -90,7 +90,7 @@ impl ConfigData {
         };
 
         let shell = match &self.shell {
-            Some(shell) => Some(shell.iter().cloned().collect()),
+            Some(shell) => Some(shell.to_vec()),
             None => None,
         };
 

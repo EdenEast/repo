@@ -16,7 +16,7 @@ pub struct ConfigData {
     host: Option<String>,
     ssh_user: Option<String>,
     scheme: Option<Scheme>,
-    shell: Option<HashSet<String>>,
+    shell: Option<Vec<String>>,
     include: HashSet<String>,
     exclude: HashSet<String>,
     path: Option<PathBuf>,
@@ -29,7 +29,7 @@ struct RawConfigData {
     default_host: Option<String>,
     default_ssh_user: Option<String>,
     default_scheme: Option<Scheme>,
-    shell: Option<HashSet<String>>,
+    shell: Option<Vec<String>>,
     include: Option<HashSet<String>>,
     exclude: Option<HashSet<String>>,
 
