@@ -1,6 +1,8 @@
 function work()
 {
-  local SCRIPT="$(repo work $@)"
+  local PROJECT="$(repo list | fzf --cycle --query=$1 --preview-window=top:50% --no-mouse)"
+  local SCRIPT="$(repo work $PROJECT $2)"
+
   case $(uname -s) in
     MINGW*|MSYS*) SCRIPT="cd $(echo "/${SCRIPT:3}" | sed -e 's/\\/\//g' -e 's/://')" ;;
   esac

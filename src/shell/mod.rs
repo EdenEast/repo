@@ -4,11 +4,11 @@ pub enum Shell {
     Zsh,
 }
 
-pub fn init(shell: Shell) -> String {
+pub fn init(shell: Shell, fzf: bool) -> String {
     match shell {
-        Shell::Bash => bash::init(),
-        Shell::Fish => fish::init(),
-        Shell::Zsh => zsh::init(),
+        Shell::Bash => bash::init(fzf),
+        Shell::Fish => fish::init(fzf),
+        Shell::Zsh => zsh::init(fzf),
     }
 }
 

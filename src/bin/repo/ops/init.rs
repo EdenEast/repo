@@ -5,6 +5,7 @@ use repo::shell;
 
 pub struct InitCommand {
     shell: String,
+    fzf: bool,
 }
 
 impl CliCommand for InitCommand {
@@ -17,6 +18,12 @@ impl CliCommand for InitCommand {
                     .possible_values(&["bash", "zsh", "fish"])
                     .required(true),
             )
+            .arg(
+                Arg::with_name("fzf")
+                    .help("Intilaize with fzf integration")
+                    .long("fzf")
+                    .short("f"),
+            )
     }
 
     fn from_matches(m: &ArgMatches) -> Self {
@@ -25,6 +32,7 @@ impl CliCommand for InitCommand {
                 .value_of("SHELL")
                 .map(String::from)
                 .expect("SHELL is a required argument"),
+            fzf: m.is_present("fzf"),
         }
     }
 
@@ -36,7 +44,7 @@ impl CliCommand for InitCommand {
             _ => return Err(anyhow!("unknown shell: {}", self.shell)),
         };
 
-        let script = shell::init(shell);
+        let script = shell::init(shell, self.fzf);
         println!("{}", script);
 
         Ok(())
