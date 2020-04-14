@@ -3,6 +3,11 @@ name = "repo"
 version = "0.1.0"
 authors = ["James Simpson <edenofest@gmail.com>"]
 edition = "2018"
+include = ["src/**/**", "Cargo.toml", "Cargo.lock"]
+description = "A sane way to manage all of your git repositories"
+repository = "https://github.com/edeneast/repo.git"
+license = "Apache-2.0"
+readme = "readme.md"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
