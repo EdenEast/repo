@@ -120,7 +120,7 @@ _repo() {
 
     case "${cmd}" in
         repo)
-            opts="-h -V --help --version add config edit foreach init list remove tag update work help"
+            opts="-h -V --help --version add config edit foreach init inspect list remove tag update work help"
             if [[ ${cur} == -* || ${COMP_CWORD} -eq 1 ]] ; then
                 COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
                 return 0
