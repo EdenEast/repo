@@ -1,0 +1,699 @@
+# The configurations that used for the recording, feel free to edit them
+config:
+
+  # Specify a command to be executed
+  # like `/bin/bash -l`, `ls`, or any other commands
+  # the default is bash for Linux
+  # or powershell.exe for Windows
+  command: ./screencast.sh
+
+  # Specify the current working directory path
+  # the default is the current working directory path
+  cwd: /home/eden
+
+  # Export additional ENV variables
+  env:
+    recording: true
+
+  # Explicitly set the number of columns
+  # or use `auto` to take the current
+  # number of columns of your shell
+  cols: 104
+
+  # Explicitly set the number of rows
+  # or use `auto` to take the current
+  # number of rows of your shell
+  rows: 30
+
+  # Amount of times to repeat GIF
+  # If value is -1, play once
+  # If value is 0, loop indefinitely
+  # If value is a positive number, loop n times
+  repeat: 0
+
+  # Quality
+  # 1 - 100
+  quality: 100
+
+  # Delay between frames in ms
+  # If the value is `auto` use the actual recording delays
+  frameDelay: auto
+
+  # Maximum delay between frames in ms
+  # Ignored if the `frameDelay` isn't set to `auto`
+  # Set to `auto` to prevent limiting the max idle time
+  maxIdleTime: 2000
+
+  # The surrounding frame box
+  # The `type` can be null, window, floating, or solid`
+  # To hide the title use the value null
+  # Don't forget to add a backgroundColor style with a null as type
+  frameBox:
+    type: solid
+    title: null
+    style:
+      background: "#292a30"
+
+  # Add a watermark image to the rendered gif
+  # You need to specify an absolute path for
+  # the image on your machine or a URL, and you can also
+  # add your own CSS styles
+  watermark:
+    imagePath: null
+    style:
+      position: absolute
+      right: 15px
+      bottom: 15px
+      width: 100px
+      opacity: 0.9
+
+  # Cursor style can be one of
+  # `block`, `underline`, or `bar`
+  cursorStyle: block
+
+  # Font family
+  # You can use any font that is installed on your machine
+  # in CSS-like syntax
+  fontFamily: "Monaco, Lucida Console, Ubuntu Mono, Monospace"
+
+  # The size of the font
+  fontSize: 12
+
+  # The height of lines
+  lineHeight: 1
+
+  # The spacing between letters
+  letterSpacing: 0
+
+  # Theme
+  theme:
+    background: "transparent"
+    foreground: "#afafaf"
+    cursor: "#c7c7c7"
+    black: "#232628"
+    red: "#fc4384"
+    green: "#b3e33b"
+    yellow: "#ffa727"
+    blue: "#75dff2"
+    magenta: "#ae89fe"
+    cyan: "#708387"
+    white: "#d5d5d0"
+    brightBlack: "#626566"
+    brightRed: "#ff7fac"
+    brightGreen: "#c8ed71"
+    brightYellow: "#ebdf86"
+    brightBlue: "#75dff2"
+    brightMagenta: "#ae89fe"
+    brightCyan: "#b1c6ca"
+    brightWhite: "#f9f9f4"
+
+# Records, feel free to edit them
+records:
+  - delay: 412
+    content: "\e[33mλ\e[39m "
+  - delay: 1010
+    content: e
+  - delay: 181
+    content: va
+  - delay: 91
+    content: l
+  - delay: 90
+    content: ' "'
+  - delay: 91
+    content: $
+  - delay: 91
+    content: (r
+  - delay: 91
+    content: e
+  - delay: 91
+    content: po
+  - delay: 91
+    content: ' '
+  - delay: 91
+    content: in
+  - delay: 182
+    content: i
+  - delay: 91
+    content: 't '
+  - delay: 91
+    content: b
+  - delay: 91
+    content: as
+  - delay: 90
+    content: h
+  - delay: 91
+    content: )"
+  - delay: 506
+    content: "\r\n"
+  - delay: 15
+    content: "\r\n"
+  - delay: 5
+    content: "\e[33mλ\e[39m "
+  - delay: 1009
+    content: r
+  - delay: 182
+    content: e
+  - delay: 91
+    content: p
+  - delay: 91
+    content: 'o '
+  - delay: 90
+    content: '-'
+  - delay: 91
+    content: '-'
+  - delay: 90
+    content: he
+  - delay: 91
+    content: l
+  - delay: 91
+    content: p
+  - delay: 505
+    content: "\r\n"
+  - delay: 15
+    content: "\e[32mrepo\e[0m 0.1.0\r\nJames Simpson <edenofest@gmail.com>\r\n\r\n\e[33m\r\nUSAGE:\e[0m\r\n    repo [OPTIONS] [SUBCOMMAND]\r\n\r\n\e[33mOPTIONS:\r\n\e[0m    \e[32m-h\e[0m, \e[32m--help\e[0m       Prints help information\r\n        \e[32m--list\e[0m       List installed commands\r\n    \e[32m-V\e[0m, \e[32m--version\e[0m    Prints version information\r\n\r\n\e[33mSUBCOMMANDS:\r\n\e[0m    \e[32madd\e[0m        Add a repository to be tracked by repo\r\n    \e[32mconfig\e[0m     Get or set configuration options\r\n    \e[32medit\e[0m       Edit a repository tracked by repo\r\n    \e[32mforeach\e[0m    Execute command for every tracked repository\r\n    \e[32mhelp\e[0m       Prints this message or the help of the given subcommand(s)\r\n    \e[32minspect\e[0m    Inspect a repository and view it's properties\r\n    \e[32mlist\e[0m       List repositories tracked by repo\r\n    \e[32mremove\e[0m     Remove a repository tracked by repo\r\n    \e[32mtag\e[0m        Manage tags\r\n    \e[32mupdate\e[0m     Update tracked repositories in repo with their remotes\r\n\r\n\e[33mλ\e[39m "
+  - delay: 1010
+    content: r
+  - delay: 181
+    content: ep
+  - delay: 91
+    content: 'o '
+  - delay: 91
+    content: t
+  - delay: 91
+    content: ag
+  - delay: 90
+    content: ' a'
+  - delay: 91
+    content: d
+  - delay: 90
+    content: 'd '
+  - delay: 91
+    content: ap
+  - delay: 91
+    content: p
+  - delay: 181
+    content: ' -'
+  - delay: 91
+    content: '-p'
+  - delay: 91
+    content: at
+  - delay: 91
+    content: h
+  - delay: 91
+    content: ' a'
+  - delay: 91
+    content: pp
+  - delay: 505
+    content: "\r\n"
+  - delay: 12
+    content: "\r\n"
+  - delay: 5
+    content: "\e[33mλ\e[39m "
+  - delay: 1010
+    content: r
+  - delay: 182
+    content: e
+  - delay: 91
+    content: p
+  - delay: 91
+    content: 'o '
+  - delay: 91
+    content: t
+  - delay: 91
+    content: a
+  - delay: 91
+    content: 'g '
+  - delay: 91
+    content: a
+  - delay: 91
+    content: d
+  - delay: 91
+    content: 'd '
+  - delay: 91
+    content: r
+  - delay: 182
+    content: u
+  - delay: 91
+    content: s
+  - delay: 91
+    content: 't '
+  - delay: 91
+    content: '-'
+  - delay: 91
+    content: '-'
+  - delay: 91
+    content: cl
+  - delay: 91
+    content: o
+  - delay: 91
+    content: 'n'
+  - delay: 90
+    content: 'e '
+  - delay: 90
+    content: ''''
+  - delay: 182
+    content: c
+  - delay: 91
+    content: a
+  - delay: 91
+    content: rg
+  - delay: 91
+    content: o
+  - delay: 91
+    content: ' '
+  - delay: 91
+    content: fe
+  - delay: 90
+    content: t
+  - delay: 91
+    content: c
+  - delay: 91
+    content: h'
+  - delay: 506
+    content: "\r\n"
+  - delay: 14
+    content: "\r\n"
+  - delay: 5
+    content: "\e[33mλ\e[39m "
+  - delay: 1010
+    content: r
+  - delay: 181
+    content: ep
+  - delay: 91
+    content: o
+  - delay: 91
+    content: ' a'
+  - delay: 91
+    content: d
+  - delay: 91
+    content: 'd '
+  - delay: 91
+    content: e
+  - delay: 90
+    content: de
+  - delay: 91
+    content: 'n'
+  - delay: 91
+    content: ea
+  - delay: 182
+    content: s
+  - delay: 91
+    content: t/
+  - delay: 91
+    content: r
+  - delay: 91
+    content: ep
+  - delay: 91
+    content: o
+  - delay: 91
+    content: ' -'
+  - delay: 90
+    content: '-'
+  - delay: 91
+    content: ta
+  - delay: 91
+    content: g
+  - delay: 91
+    content: ' a'
+  - delay: 182
+    content: p
+  - delay: 91
+    content: 'p '
+  - delay: 91
+    content: '-'
+  - delay: 91
+    content: '-t'
+  - delay: 91
+    content: a
+  - delay: 91
+    content: 'g '
+  - delay: 90
+    content: r
+  - delay: 91
+    content: us
+  - delay: 91
+    content: t
+  - delay: 91
+    content: ' -'
+  - delay: 182
+    content: '-'
+  - delay: 91
+    content: wo
+  - delay: 91
+    content: r
+  - delay: 91
+    content: 'k '
+  - delay: 91
+    content: ''''
+  - delay: 91
+    content: ls
+  - delay: 91
+    content: ''''
+  - delay: 505
+    content: "\r\n"
+  - delay: 17
+    content: "\r\n"
+  - delay: 6
+    content: "\e[33mλ\e[39m "
+  - delay: 1010
+    content: r
+  - delay: 181
+    content: e
+  - delay: 91
+    content: po
+  - delay: 91
+    content: ' '
+  - delay: 91
+    content: a
+  - delay: 91
+    content: dd
+  - delay: 91
+    content: ' '
+  - delay: 91
+    content: ru
+  - delay: 91
+    content: s
+  - delay: 91
+    content: t
+  - delay: 91
+    content: '-l'
+  - delay: 181
+    content: a
+  - delay: 91
+    content: ng
+  - delay: 91
+    content: /
+  - delay: 91
+    content: m
+  - delay: 91
+    content: db
+  - delay: 91
+    content: o
+  - delay: 91
+    content: ok
+  - delay: 505
+    content: "\r\n"
+  - delay: 14
+    content: "\r\n"
+  - delay: 5
+    content: "\e[33mλ\e[39m "
+  - delay: 1009
+    content: r
+  - delay: 181
+    content: e
+  - delay: 90
+    content: po
+  - delay: 91
+    content: ' '
+  - delay: 91
+    content: a
+  - delay: 91
+    content: dd
+  - delay: 91
+    content: ' '
+  - delay: 91
+    content: cl
+  - delay: 91
+    content: a
+  - delay: 91
+    content: p
+  - delay: 182
+    content: '-r'
+  - delay: 91
+    content: s
+  - delay: 90
+    content: /c
+  - delay: 91
+    content: l
+  - delay: 90
+    content: a
+  - delay: 91
+    content: p
+  - delay: 506
+    content: "\r\n"
+  - delay: 15
+    content: "\r\n"
+  - delay: 5
+    content: "\e[33mλ\e[39m "
+  - delay: 1010
+    content: r
+  - delay: 181
+    content: ep
+  - delay: 91
+    content: o
+  - delay: 91
+    content: ' c'
+  - delay: 90
+    content: o
+  - delay: 90
+    content: nf
+  - delay: 91
+    content: i
+  - delay: 91
+    content: 'g '
+  - delay: 91
+    content: r
+  - delay: 91
+    content: oo
+  - delay: 182
+    content: t
+  - delay: 505
+    content: "\r\n"
+  - delay: 7
+    content: "/home/eden/repo\r\n"
+  - delay: 5
+    content: "\r\n"
+  - delay: 5
+    content: "\e[33mλ\e[39m "
+  - delay: 1009
+    content: r
+  - delay: 181
+    content: e
+  - delay: 90
+    content: p
+  - delay: 90
+    content: 'o '
+  - delay: 91
+    content: c
+  - delay: 91
+    content: o
+  - delay: 91
+    content: nf
+  - delay: 91
+    content: i
+  - delay: 91
+    content: g
+  - delay: 91
+    content: ' r'
+  - delay: 182
+    content: o
+  - delay: 91
+    content: o
+  - delay: 91
+    content: t
+  - delay: 90
+    content: ' ~'
+  - delay: 91
+    content: /
+  - delay: 91
+    content: c
+  - delay: 91
+    content: us
+  - delay: 91
+    content: t
+  - delay: 91
+    content: o
+  - delay: 91
+    content: m/
+  - delay: 182
+    content: w
+  - delay: 91
+    content: o
+  - delay: 91
+    content: r
+  - delay: 90
+    content: ks
+  - delay: 91
+    content: p
+  - delay: 91
+    content: a
+  - delay: 91
+    content: ce
+  - delay: 506
+    content: "\r\n"
+  - delay: 13
+    content: "\r\n"
+  - delay: 5
+    content: "\e[33mλ\e[39m "
+  - delay: 1009
+    content: r
+  - delay: 181
+    content: ep
+  - delay: 91
+    content: 'o '
+  - delay: 91
+    content: u
+  - delay: 91
+    content: pd
+  - delay: 90
+    content: at
+  - delay: 91
+    content: e
+  - delay: 505
+    content: "\r\n"
+  - delay: 2895
+    content: "\r\n"
+  - delay: 5
+    content: "\e[33mλ\e[39m "
+  - delay: 1010
+    content: r
+  - delay: 181
+    content: ep
+  - delay: 91
+    content: 'o '
+  - delay: 91
+    content: f
+  - delay: 91
+    content: or
+  - delay: 90
+    content: ea
+  - delay: 91
+    content: c
+  - delay: 91
+    content: 'h '
+  - delay: 91
+    content: '''p'
+  - delay: 91
+    content: w
+  - delay: 182
+    content: d'
+  - delay: 505
+    content: "\r\n"
+  - delay: 13
+    content: "                repo | /home/eden/custom/workspace/app/repo\r\n                clap | /home/eden/custom/workspace/clap\r\n"
+  - delay: 5
+    content: "              mdbook | /home/eden/custom/workspace/mdbook\r\n"
+  - delay: 6
+    content: "\r\n"
+  - delay: 5
+    content: "\e[33mλ\e[39m "
+  - delay: 1010
+    content: r
+  - delay: 182
+    content: e
+  - delay: 91
+    content: po
+  - delay: 91
+    content: ' '
+  - delay: 91
+    content: f
+  - delay: 91
+    content: or
+  - delay: 91
+    content: e
+  - delay: 90
+    content: ac
+  - delay: 91
+    content: h
+  - delay: 91
+    content: ' '
+  - delay: 91
+    content: '''g'
+  - delay: 182
+    content: i
+  - delay: 91
+    content: 't '
+  - delay: 91
+    content: r
+  - delay: 91
+    content: e
+  - delay: 91
+    content: v-
+  - delay: 91
+    content: p
+  - delay: 90
+    content: ar
+  - delay: 91
+    content: s
+  - delay: 91
+    content: e
+  - delay: 91
+    content: ' -'
+  - delay: 182
+    content: '-'
+  - delay: 91
+    content: ab
+  - delay: 91
+    content: b
+  - delay: 91
+    content: r
+  - delay: 91
+    content: ev
+  - delay: 91
+    content: '-'
+  - delay: 90
+    content: re
+  - delay: 91
+    content: f
+  - delay: 91
+    content: ' '
+  - delay: 91
+    content: HE
+  - delay: 182
+    content: A
+  - delay: 91
+    content: D'
+  - delay: 505
+    content: "\r\n"
+  - delay: 17
+    content: "              mdbook | master\r\n"
+  - delay: 10
+    content: "                repo | master\r\n"
+  - delay: 10
+    content: "                clap | master\r\n"
+  - delay: 6
+    content: "\r\n"
+  - delay: 5
+    content: "\e[33mλ\e[39m "
+  - delay: 1010
+    content: w
+  - delay: 181
+    content: or
+  - delay: 90
+    content: k
+  - delay: 91
+    content: ' r'
+  - delay: 91
+    content: e
+  - delay: 91
+    content: po
+  - delay: 504
+    content: "\r\n"
+  - delay: 21
+    content: "Cargo.lock  Cargo.toml\tLICENSE  readme.md  rustfmt.toml  src\r\n\r\n"
+  - delay: 5
+    content: "\e[33mλ\e[39m "
+  - delay: 1010
+    content: p
+  - delay: 182
+    content: w
+  - delay: 91
+    content: d
+  - delay: 90
+    content: ' ;'
+  - delay: 90
+    content: ' '
+  - delay: 91
+    content: l
+  - delay: 91
+    content: s
+  - delay: 505
+    content: "\r\n/home/eden/custom/workspace/app/repo\r\n"
+  - delay: 5
+    content: "Cargo.lock  Cargo.toml\tLICENSE  readme.md  rustfmt.toml  src\r\n"
+  - delay: 5
+    content: "\r\n"
+  - delay: 5
+    content: "\e[33mλ\e[39m "
+  - delay: 3004
+    content: "\r\n"
