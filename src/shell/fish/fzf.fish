@@ -7,7 +7,7 @@ function __fish_repo_use_internal
 end
 
 function work
-  set -l PROJECT (repo list | fzf --cycle --preview-window=top:50% --no-mouse --query "$1")
+  set -l PROJECT (repo list | fzf --cycle --preview-window=top:50% --preview='repo inspect {}' --no-mouse --query "$1")
   set -l script (repo work $PROJECT $2)
   __fish_repo_use_internal $status $script
 end

@@ -1,6 +1,6 @@
 unction work()
 {
-  PROJECT="$(repo list | fzf --cycle --query=$1 --preview-window=top:50% --no-mouse)"
+  PROJECT="$(repo list | fzf --cycle --query=$1 --preview-window=top:50% --preview='repo inspect {}' --no-mouse)"
   SCRIPT="$(repo work $PROJECT $2)"
   case $(uname -s) in
     MINGW*|MSYS*) SCRIPT="cd $(echo "/${SCRIPT:3}" | sed -e 's/\\/\//g' -e 's/://')" ;;
