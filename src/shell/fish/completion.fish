@@ -13,6 +13,7 @@ complete -c repo -n "__fish_use_subcommand" -f -a "config" -d 'Get or set config
 complete -c repo -n "__fish_use_subcommand" -f -a "edit" -d 'Edit a repository tracked by repo'
 complete -c repo -n "__fish_use_subcommand" -f -a "foreach" -d 'Execute command for every tracked repository'
 complete -c repo -n "__fish_use_subcommand" -f -a "init" -d 'Prints the shell function used to integrate repo with shell'
+complete -c repo -n "__fish_use_subcommand" -f -a "inspect" -d 'Inspect a repository and view its properties'
 complete -c repo -n "__fish_use_subcommand" -f -a "list" -d 'List repositories tracked by repo'
 complete -c repo -n "__fish_use_subcommand" -f -a "remove" -d 'Remove a repository tracked by repo'
 complete -c repo -n "__fish_use_subcommand" -f -a "tag" -d 'Manage tags'
@@ -48,6 +49,9 @@ complete -c repo -n "__fish_seen_subcommand_from foreach" -s t -l tag -d 'Perfor
 complete -c repo -n "__fish_seen_subcommand_from foreach" -s l -l local -d 'Perform operation on only local repositories'
 complete -c repo -n "__fish_seen_subcommand_from foreach" -s g -l global -d 'Perform operation on only global repositories'
 complete -c repo -n "__fish_seen_subcommand_from foreach" -s a -l all -d 'Perform operation on all repositories, global and local'
+
+complete -c repo -n "__fish_seen_subcommand_from inspect" -s f -l format -d 'Define the output format of the inspection'
+complete -c repo -n "__fish_seen_subcommand_from inspect" -x -a "bash ron toml"
 
 complete -c repo -n "__fish_seen_subcommand_from list" -s l -l local -d 'Show only local repositories'
 complete -c repo -n "__fish_seen_subcommand_from list" -s g -l global -d 'Show only global repositories'

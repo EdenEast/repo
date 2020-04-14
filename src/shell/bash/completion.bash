@@ -94,6 +94,8 @@ _repo() {
                 ;;
             init)
                 cmd+="__init"
+            inspect)
+                cmd+="__inspect"
                 ;;
             list)
                 cmd+="__list"
@@ -204,6 +206,18 @@ _repo() {
                 *,--*) __repo_comp "$ops" ; return 0 ;;
                 ,--*) __repo_comp "$ops" ; return 0 ;;
                 ,*) __repo_comp "$shells" ; return 0 ;;
+            esac
+            __repo_comp "$shells"
+            return 0
+            ;;
+
+        repo__inspect)
+            local formats="bash zsh fish"
+            local value="$(__find_on--help --version_cmdline "$formats")"
+            local ops="--help --version --format"
+            case "$value,$cur" in
+                *,--*) __repo_comp "$ops" ; return 0 ;;
+                *,--format) __repo_comp "$formats" ; return 0 ;;
             esac
             __repo_comp "$shells"
             return 0

@@ -55,6 +55,7 @@ define_app! {
     "edit" => [self::edit::EditCommand: &[]],
     "foreach" => [self::foreach::ForeachCommand: &[]],
     "init" => [self::init::InitCommand: &[]],
+    "inspect" => [self::inspect::InspectCommand: &[]],
     "list" => [self::list::ListCommand: &[]],
     "remove" => [self::remove::RemoveCommand: &[]],
     "tag" => [self::tag::TagCommand: &[]],
@@ -73,6 +74,7 @@ mod config;
 mod edit;
 mod foreach;
 mod init;
+mod inspect;
 mod list;
 mod remove;
 mod tag;

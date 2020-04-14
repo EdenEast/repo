@@ -124,6 +124,17 @@ _arguments "${_arguments_options[@]}" \
 ':SHELL -- Name of the shell the shell function will generate:(bash zsh fish)' \
 && ret=0
 ;;
+(inspect)
+_arguments "${_arguments_options[@]}" \
+'-h[Prints help information]' \
+'--help[Prints help information]' \
+'-V[Prints version information]' \
+'--version[Prints version information]' \
+'-f+[Define the output format of the inspection]:(json ron toml)' \
+'--format=[Define the output format of the inspection]:(json ron toml)' \
+'::NAME -- Name of the repository to be inspected:_repo_repositories' \
+&& ret=0
+;;
 (list)
 _arguments "${_arguments_options[@]}" \
 '-l[Show only local repositories]' \
@@ -281,6 +292,7 @@ _repo_commands() {
 "edit:Edit a repository tracked by repo" \
 "foreach:Execute command for every tracked repository" \
 "init:Prints the shell function used to integrate repo with shell" \
+"inspect:Inspect a repository and view it's properties" \
 "list:List repositories tracked by repo" \
 "remove:Remove a repository tracked by repo" \
 "tag:Manage tags" \
@@ -351,7 +363,14 @@ _repo__init_commands() {
     local commands; commands=(
 
     )
-    _describe -t commands 'repo init commands' commands "$@"
+    _describe -t commands 'repo inspect commands' commands "$@"
+}
+(( $+functions[_repo__inspect_commands] )) ||
+_repo__inspect_commands() {
+    local commands; commands=(
+
+    )
+    _describe -t commands 'repo inspect commands' commands "$@"
 }
 (( $+functions[_repo__list_commands] )) ||
 _repo__list_commands() {
