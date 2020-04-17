@@ -582,7 +582,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "repo"
+name = "repo-cli"
 version = "0.1.0"
 dependencies = [
  "anyhow",

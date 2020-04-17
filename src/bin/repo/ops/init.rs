@@ -1,7 +1,7 @@
 use super::CliCommand;
 use anyhow::{anyhow, Result};
 use clap::{App, AppSettings, Arg, ArgMatches};
-use repo::shell;
+use repo_cli::shell;
 
 pub struct InitCommand {
     shell: String,

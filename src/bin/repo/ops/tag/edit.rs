@@ -1,7 +1,7 @@
 use crate::ops::CliCommand;
 use anyhow::{anyhow, Context, Result};
 use clap::{App, AppSettings, Arg, ArgMatches};
-use repo::prelude::*;
+use repo_cli::prelude::*;
 use std::path::PathBuf;
 
 pub struct EditCommand {
@@ -175,7 +175,7 @@ impl CliCommand for EditCommand {
 
         if self.edit {
             let editor = std::env::var("EDITOR").unwrap_or_else(|_| String::from("vim"));
-            let status = repo::util::process::inherit(&editor)
+            let status = repo_cli::util::process::inherit(&editor)
                 .arg(&tag.config)
                 .status()?;
 

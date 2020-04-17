@@ -1,7 +1,7 @@
 use super::CliCommand;
 use anyhow::Result;
 use clap::{App, AppSettings, Arg, ArgMatches, SubCommand};
-use repo::prelude::*;
+use repo_cli::prelude::*;
 use std::{path::PathBuf, str::FromStr};
 
 pub struct ConfigCommand {
@@ -99,7 +99,9 @@ impl CliCommand for ConfigCommand {
         if self.edit {
             let path = config.path(location).join("config.toml");
             let editor = std::env::var("EDITOR").unwrap_or_else(|_| String::from("vim"));
-            let status = repo::util::process::inherit(&editor).arg(&path).status()?;
+            let status = repo_cli::util::process::inherit(&editor)
+                .arg(&path)
+                .status()?;
 
             if !status.success() {
                 let code = status.code().unwrap_or(1);

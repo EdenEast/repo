@@ -1,14 +1,16 @@
 use anyhow::Result;
 use clap::{
-    app_from_crate, crate_authors, crate_description, crate_name, crate_version, App, AppSettings,
-    Arg, ArgMatches, SubCommand,
+    crate_authors, crate_description, crate_version, App, AppSettings, Arg, ArgMatches, SubCommand,
 };
 
 macro_rules! define_app {
     ($( $name:expr => [$t:ty: $aliases:expr], )*) => {
         pub fn app<'a, 'b: 'a>() -> App<'a, 'b> {
-            app_from_crate!()
-                .bin_name(crate_name!()) // stop windows from adding .exe
+            App::new("repo")
+                .version(crate_version!())
+                .author(crate_authors!())
+                .about(crate_description!())
+                .bin_name("repo") // stop windows from adding .exe
                 .max_term_width(100)
                 .settings(&[
                     AppSettings::GlobalVersion,

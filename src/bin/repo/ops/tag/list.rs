@@ -1,7 +1,7 @@
 use crate::ops::CliCommand;
 use anyhow::Result;
 use clap::{App, AppSettings, Arg, ArgMatches};
-use repo::{Location, Workspace};
+use repo_cli::{Location, Workspace};
 
 pub struct ListCommand {
     local: bool,

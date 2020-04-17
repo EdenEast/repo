@@ -1,7 +1,7 @@
 use super::CliCommand;
 use anyhow::{anyhow, bail, Result};
 use clap::{values_t, App, AppSettings, Arg, ArgMatches};
-use repo::prelude::*;
+use repo_cli::prelude::*;
 
 pub struct AddCommand {
     url: String,

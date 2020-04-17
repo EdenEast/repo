@@ -1,7 +1,7 @@
 use super::CliCommand;
 use anyhow::{anyhow, Context, Result};
 use clap::{values_t, App, AppSettings, Arg, ArgMatches};
-use repo::{prelude::*, util::process};
+use repo_cli::{prelude::*, util::process};
 
 pub struct ForeachCommand {
     cmd: String,

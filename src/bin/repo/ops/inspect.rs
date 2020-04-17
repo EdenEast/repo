@@ -1,7 +1,7 @@
 use super::CliCommand;
 use anyhow::{anyhow, bail, Result};
 use clap::{App, AppSettings, Arg, ArgMatches};
-use repo::{prelude::*, util};
+use repo_cli::{prelude::*, util};
 
 pub struct InspectCommand {
     name: String,

@@ -2,7 +2,7 @@ use super::CliCommand;
 use anyhow::Result;
 use clap::{values_t, App, AppSettings, Arg, ArgMatches};
 use dialoguer::Confirmation;
-use repo::prelude::*;
+use repo_cli::prelude::*;
 
 pub struct RemoveCommand {
     names: Vec<String>,

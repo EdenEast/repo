@@ -1,7 +1,7 @@
 use super::CliCommand;
 use anyhow::{anyhow, Result};
 use clap::{App, AppSettings, Arg, ArgMatches};
-use repo::prelude::*;
+use repo_cli::prelude::*;
 
 pub struct WorkCommand {
     name: String,

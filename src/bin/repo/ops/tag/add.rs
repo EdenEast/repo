@@ -1,7 +1,7 @@
 use crate::ops::CliCommand;
 use anyhow::{Context, Result};
 use clap::{App, AppSettings, Arg, ArgMatches};
-use repo::{Location, TagBuilder, Workspace};
+use repo_cli::{Location, TagBuilder, Workspace};
 
 pub struct AddCommand {
     name: String,

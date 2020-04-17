@@ -1,7 +1,7 @@
 use super::CliCommand;
 use anyhow::Result;
 use clap::{values_t, App, AppSettings, Arg, ArgMatches};
-use repo::prelude::*;
+use repo_cli::prelude::*;
 
 pub struct UpdateCommand {
     local: bool,
