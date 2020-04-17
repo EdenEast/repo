@@ -26,14 +26,14 @@ impl CliCommand for InitCommand {
             )
     }
 
-    fn from_matches(m: &ArgMatches) -> Self {
-        Self {
+    fn from_matches(m: &ArgMatches) -> Result<Box<Self>> {
+        Ok(Box::new(Self {
             shell: m
                 .value_of("SHELL")
                 .map(String::from)
                 .expect("SHELL is a required argument"),
             fzf: m.is_present("fzf"),
-        }
+        }))
     }
 
     fn run(self, _: &ArgMatches) -> Result<()> {

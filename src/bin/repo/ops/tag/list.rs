@@ -26,11 +26,11 @@ impl CliCommand for ListCommand {
             )
     }
 
-    fn from_matches(m: &ArgMatches) -> Self {
-        Self {
+    fn from_matches(m: &ArgMatches) -> Result<Box<Self>> {
+        Ok(Box::new(Self {
             local: m.is_present("local"),
             global: m.is_present("global"),
-        }
+        }))
     }
 
     fn run(self, _: &ArgMatches) -> Result<()> {

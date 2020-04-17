@@ -29,12 +29,12 @@ impl CliCommand for RemoveCommand {
             )
     }
 
-    fn from_matches(m: &ArgMatches) -> Self {
-        Self {
+    fn from_matches(m: &ArgMatches) -> Result<Box<Self>> {
+        Ok(Box::new(Self {
             names: values_t!(m, "NAME", String)
                 .expect("failed to convert &str to String... wait what???"),
             force: m.is_present("force"),
-        }
+        }))
     }
 
     fn run(self, _: &ArgMatches) -> Result<()> {

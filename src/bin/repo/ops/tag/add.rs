@@ -1,5 +1,5 @@
 use crate::ops::CliCommand;
-use anyhow::Result;
+use anyhow::{Context, Result};
 use clap::{App, AppSettings, Arg, ArgMatches};
 use repo::{Location, TagBuilder, Workspace};
 
@@ -8,6 +8,7 @@ pub struct AddCommand {
     path: Option<String>,
     clone: Option<String>,
     work: Option<String>,
+    priority: Option<i32>,
     local: bool,
 }
 
@@ -72,10 +73,41 @@ impl CliCommand for AddCommand {
                     .takes_value(true)
                     .value_name("COMMAND")
             )
+            .arg(
+                Arg::with_name("priority")
+                    .help("Set the tag priority")
+                    .long_help(
+                        "Set the tag priority. Tags will be applied from lowest to highest. Priority ties\n\
+                        are resolved alphabetically")
+                    .long("priority")
+                    .short("n")
+                    .takes_value(true)
+                    .value_name("number")
+            )
     }
 
-    fn from_matches(m: &ArgMatches) -> Self {
-        Self {
+    fn from_matches(m: &ArgMatches) -> Result<Box<Self>> {
+        let pri: Option<Result<i32>> = match m.value_of("priority") {
+            Some(s) => Some(
+                s.parse()
+                    .context("converting priority option from user")
+                    .map_err(Into::into),
+            ),
+            None => None,
+        };
+
+        let priority = match pri {
+            Some(result) => {
+                if let Err(e) = result {
+                    return Err(e);
+                }
+
+                Some(result.unwrap())
+            }
+            None => None,
+        };
+
+        Ok(Box::new(Self {
             name: m
                 .value_of("NAME")
                 .map(String::from)
@@ -83,8 +115,9 @@ impl CliCommand for AddCommand {
             path: m.value_of("path").map(String::from),
             clone: m.value_of("clone").map(String::from),
             work: m.value_of("work").map(String::from),
+            priority,
             local: m.is_present("local"),
-        }
+        }))
     }
 
     fn run(self, _: &ArgMatches) -> Result<()> {
@@ -110,6 +143,10 @@ impl CliCommand for AddCommand {
 
         if let Some(work) = self.work {
             builder = builder.work(work);
+        }
+
+        if let Some(priority) = self.priority {
+            builder = builder.priority(priority);
         }
 
         workspace.add_tag(builder.build())

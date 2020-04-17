@@ -144,8 +144,8 @@ impl CliCommand for AddCommand {
             )
     }
 
-    fn from_matches(m: &ArgMatches) -> Self {
-        Self {
+    fn from_matches(m: &ArgMatches) -> Result<Box<Self>> {
+        Ok(Box::new(Self {
             url: m
                 .value_of("URL")
                 .map(String::from)
@@ -159,7 +159,7 @@ impl CliCommand for AddCommand {
             local: m.is_present("local"),
             force: m.is_present("force"),
             cli: m.is_present("cli"),
-        }
+        }))
     }
 
     fn run(self, _: &ArgMatches) -> Result<()> {

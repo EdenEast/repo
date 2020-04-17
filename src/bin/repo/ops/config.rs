@@ -68,8 +68,8 @@ impl CliCommand for ConfigCommand {
             )
     }
 
-    fn from_matches(m: &ArgMatches) -> Self {
-        Self {
+    fn from_matches(m: &ArgMatches) -> Result<Box<Self>> {
+        Ok(Box::new(Self {
             name: m.value_of("NAME").map(String::from),
             value: m.value_of("VALUE").map(String::from),
             local: m.is_present("local"),
@@ -78,7 +78,7 @@ impl CliCommand for ConfigCommand {
             edit: m.is_present("edit"),
             list: m.is_present("list"),
             name_only: m.is_present("name-only"),
-        }
+        }))
     }
 
     fn run(self, _: &ArgMatches) -> Result<()> {

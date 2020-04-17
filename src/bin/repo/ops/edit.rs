@@ -7,6 +7,8 @@ use std::path::PathBuf;
 pub struct EditCommand {
     name: String,
     path: Option<String>,
+    clone: Option<String>,
+    work: Option<String>,
     tags: Option<Vec<String>>,
     remotes: Option<Vec<String>>,
     local: bool,
@@ -76,6 +78,30 @@ impl CliCommand for EditCommand {
                     .value_name("path")
             )
             .arg(
+                Arg::with_name("clone")
+                    .help("Execute command after being cloned by the update command")
+                    .long_help(
+                        "Execute command after being cloned by the update command. If this repository contains links to\n\
+                        tags that also contain 'clone' actions the repository actions will be executed first followed\n\
+                        by the tags, ordered by priority")
+                    .long("clone")
+                    .short("c")
+                    .takes_value(true)
+                    .value_name("command")
+            )
+            .arg(
+                Arg::with_name("work")
+                    .help("Execute command after calling the work command")
+                    .long_help(
+                        "Execute command after calling the work command. If this repository contains links to\n\
+                        tags that also contain 'work' actions the repository actions will be executed first followed\n\
+                        by the tags, ordered by priority")
+                    .long("work")
+                    .short("w")
+                    .takes_value(true)
+                    .value_name("command")
+            )
+            .arg(
                 Arg::with_name("remote")
                     .help("Add an additional remote")
                     .long_help(
@@ -104,8 +130,8 @@ impl CliCommand for EditCommand {
             )
     }
 
-    fn from_matches(m: &ArgMatches) -> Self {
-        Self {
+    fn from_matches(m: &ArgMatches) -> Result<Box<Self>> {
+        Ok(Box::new(Self {
             name: m
                 .value_of("NAME")
                 .map(String::from)
@@ -113,11 +139,13 @@ impl CliCommand for EditCommand {
             tags: values_t!(m, "tag", String).ok(),
             remotes: values_t!(m, "remote", String).ok(),
             path: m.value_of("path").map(String::from),
+            clone: m.value_of("clone").map(String::from),
+            work: m.value_of("work").map(String::from),
             local: m.is_present("local"),
             global: m.is_present("global"),
             edit: m.is_present("edit"),
             cli: m.is_present("cli"),
-        }
+        }))
     }
 
     fn run(self, _: &ArgMatches) -> Result<()> {
@@ -129,6 +157,14 @@ impl CliCommand for EditCommand {
 
         if self.path.is_some() {
             repository.path = self.path.map(PathBuf::from);
+        }
+
+        if self.clone.is_some() {
+            repository.clone = self.clone;
+        }
+
+        if self.work.is_some() {
+            repository.work = self.work;
         }
 
         if self.cli {

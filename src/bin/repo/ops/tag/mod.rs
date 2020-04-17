@@ -9,8 +9,8 @@ impl CliCommand for TagCommand {
         app.about("Manage tags").subcommands(internal_commands())
     }
 
-    fn from_matches(_: &ArgMatches) -> Self {
-        Self {}
+    fn from_matches(_: &ArgMatches) -> Result<Box<Self>> {
+        Ok(Box::new(Self {}))
     }
 
     fn run(self, m: &ArgMatches) -> Result<()> {
@@ -29,7 +29,7 @@ macro_rules! define_run {
 
         fn internal_run(command: &str, matches: Option<&ArgMatches>) -> Result<()> {
             match (command, matches) {
-                $( ($name, Some(m)) => <$t>::from_matches(m).run(m), )*
+                $( ($name, Some(m)) => <$t>::from_matches(m)?.run(m), )*
                 _ => unreachable!(),
             }
         }

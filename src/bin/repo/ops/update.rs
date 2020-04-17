@@ -46,13 +46,13 @@ impl CliCommand for UpdateCommand {
             )
     }
 
-    fn from_matches(m: &ArgMatches) -> Self {
-        Self {
+    fn from_matches(m: &ArgMatches) -> Result<Box<Self>> {
+        Ok(Box::new(Self {
             local: m.is_present("local"),
             global: m.is_present("global"),
             all: m.is_present("all"),
             tags: values_t!(m, "tag", String).ok(),
-        }
+        }))
     }
 
     fn run(self, _: &ArgMatches) -> Result<()> {

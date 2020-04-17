@@ -38,7 +38,7 @@ macro_rules! define_app {
             }
 
             match matches.subcommand() {
-                $( ($name, Some(m)) => <$t>::from_matches(m).run(m), )*
+                $( ($name, Some(m)) => <$t>::from_matches(m)?.run(m), )*
                 _ => {
                     app().print_help()?;
                     println!("");
@@ -65,7 +65,7 @@ define_app! {
 
 pub trait CliCommand {
     fn app<'a, 'b: 'a>(app: App<'a, 'b>) -> App<'a, 'b>;
-    fn from_matches(m: &ArgMatches) -> Self;
+    fn from_matches(m: &ArgMatches) -> Result<Box<Self>>;
     fn run(self, m: &ArgMatches) -> Result<()>;
 }
 

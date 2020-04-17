@@ -53,8 +53,8 @@ impl CliCommand for ForeachCommand {
             )
     }
 
-    fn from_matches(m: &ArgMatches) -> Self {
-        Self {
+    fn from_matches(m: &ArgMatches) -> Result<Box<Self>> {
+        Ok(Box::new(Self {
             cmd: m
                 .value_of("CMD")
                 .map(String::from)
@@ -63,7 +63,7 @@ impl CliCommand for ForeachCommand {
             local: m.is_present("local"),
             global: m.is_present("global"),
             all: m.is_present("all"),
-        }
+        }))
     }
 
     fn run(self, _: &ArgMatches) -> Result<()> {

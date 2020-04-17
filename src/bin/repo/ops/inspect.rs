@@ -27,14 +27,14 @@ impl CliCommand for InspectCommand {
             )
     }
 
-    fn from_matches(m: &ArgMatches) -> Self {
-        Self {
+    fn from_matches(m: &ArgMatches) -> Result<Box<Self>> {
+        Ok(Box::new(Self {
             name: m
                 .value_of("NAME")
                 .map(String::from)
                 .expect("NAME is a required argument"),
             format: m.value_of("format").map(String::from),
-        }
+        }))
     }
 
     fn run(self, _: &ArgMatches) -> Result<()> {

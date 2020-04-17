@@ -29,14 +29,14 @@ impl CliCommand for WorkCommand {
             )
     }
 
-    fn from_matches(m: &ArgMatches) -> Self {
-        Self {
+    fn from_matches(m: &ArgMatches) -> Result<Box<Self>> {
+        Ok(Box::new(Self {
             name: m
                 .value_of("NAME")
                 .map(String::from)
                 .expect("NAME is a required argument"),
             quick: m.is_present("quick"),
-        }
+        }))
     }
 
     fn run(self, _: &ArgMatches) -> Result<()> {

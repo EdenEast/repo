@@ -59,8 +59,8 @@ impl CliCommand for EditCommand {
             )
     }
 
-    fn from_matches(m: &ArgMatches) -> Self {
-        Self {
+    fn from_matches(m: &ArgMatches) -> Result<Box<Self>> {
+        Ok(Box::new(Self {
             name: m
                 .value_of("NAME")
                 .map(String::from)
@@ -69,7 +69,7 @@ impl CliCommand for EditCommand {
             local: m.is_present("local"),
             global: m.is_present("global"),
             edit: m.is_present("edit"),
-        }
+        }))
     }
 
     fn run(self, _: &ArgMatches) -> Result<()> {
