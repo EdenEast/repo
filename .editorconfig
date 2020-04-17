@@ -9,5 +9,5 @@ insert_final_newline = true
 tab_width = 4
 trim_trailing_whitespace = true
 
-[*.{yml,bash,zsh,fish}]
+[*.{yml,bash,zsh,fish,md}]
 indent_size = 2
