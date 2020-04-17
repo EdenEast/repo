@@ -115,6 +115,11 @@ impl CliCommand for ForeachCommand {
             let cwd = workspace_root.join(repository.resolve_workspace_path(workspace.cache()));
             let name = repository.name.as_str();
 
+            if !cwd.is_dir() {
+                warn!("skipping as '{}' has not been cloned", &name);
+                continue;
+            }
+
             let cmd = self.cmd.to_owned();
             trace!("exec: '{}' in: {:#?}", cmd, cwd);
             let mut command = process::piped(program);
