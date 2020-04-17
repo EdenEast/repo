@@ -1,5 +1,5 @@
 use crate::ops::CliCommand;
-use anyhow::{anyhow, Result};
+use anyhow::{anyhow, Context, Result};
 use clap::{App, AppSettings, Arg, ArgMatches};
 use repo::prelude::*;
 use std::path::PathBuf;
@@ -7,6 +7,9 @@ use std::path::PathBuf;
 pub struct EditCommand {
     name: String,
     path: Option<String>,
+    clone: Option<String>,
+    work: Option<String>,
+    priority: Option<i32>,
     local: bool,
     global: bool,
     edit: bool,
@@ -57,18 +60,76 @@ impl CliCommand for EditCommand {
                     .short("p")
                     .takes_value(true)
             )
+            .arg(
+                Arg::with_name("clone")
+                    .help("Execute command after being cloned by the update command")
+                    .long_help(
+                        "Execute command after being cloned by the update command. If a repository contains links to\n\
+                        tags that also contain 'clone' actions the repository actions will be executed first followed\n\
+                        by the tags, ordered by priority")
+                    .long("clone")
+                    .short("c")
+                    .takes_value(true)
+                    .value_name("COMMAND")
+            )
+            .arg(
+                Arg::with_name("work")
+                    .help("Execute command after calling the work command")
+                    .long_help(
+                        "Execute command after calling the work command. If a repository contains links to\n\
+                        tags that also contain 'work' actions the repository actions will be executed first followed\n\
+                        by the tags, ordered by priority")
+                    .long("work")
+                    .short("w")
+                    .takes_value(true)
+                    .value_name("COMMAND")
+            )
+            .arg(
+                Arg::with_name("priority")
+                    .help("Set the tag priority")
+                    .long_help(
+                        "Set the tag priority. Tags will be applied from lowest to highest. Priority ties\n\
+                        are resolved alphabetically")
+                    .long("priority")
+                    .short("n")
+                    .takes_value(true)
+                    .value_name("number")
+            )
     }
 
     fn from_matches(m: &ArgMatches) -> Result<Box<Self>> {
+        let pri: Option<Result<i32>> = match m.value_of("priority") {
+            Some(s) => Some(
+                s.parse()
+                    .context("converting priority option from user")
+                    .map_err(Into::into),
+            ),
+            None => None,
+        };
+
+        let priority = match pri {
+            Some(result) => {
+                if let Err(e) = result {
+                    return Err(e);
+                }
+
+                Some(result.unwrap())
+            }
+            None => None,
+        };
+
         Ok(Box::new(Self {
             name: m
                 .value_of("NAME")
                 .map(String::from)
                 .expect("NAME is a required argument"),
             path: m.value_of("path").map(String::from),
+            clone: m.value_of("clone").map(String::from),
+            work: m.value_of("work").map(String::from),
             local: m.is_present("local"),
             global: m.is_present("global"),
             edit: m.is_present("edit"),
+            priority,
         }))
     }
 
@@ -81,6 +142,18 @@ impl CliCommand for EditCommand {
 
         if self.path.is_some() {
             tag.path = self.path.map(PathBuf::from);
+        }
+
+        if self.priority.is_some() {
+            tag.priority = self.priority;
+        }
+
+        if self.clone.is_some() {
+            tag.clone = self.clone;
+        }
+
+        if self.work.is_some() {
+            tag.work = self.work;
         }
 
         if self.local || self.global {
