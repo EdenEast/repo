@@ -278,5 +278,4 @@ See [LICENSE](./LICENSE) file for more details.
 [//]: # (general)
 
 [apache-2.0]: https://apache.org/licenses/LICENSE-2.0
-'$SHELL' is not recognized as an internal or external command,
-operable program or batch file.
+

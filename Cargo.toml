@@ -3,9 +3,19 @@ name = "repo"
 version = "0.1.0"
 authors = ["James Simpson <edenofest@gmail.com>"]
 edition = "2018"
-include = ["src/**/**", "Cargo.toml", "Cargo.lock"]
+include = ["src/**/**", "Cargo.toml", "Cargo.lock", "readme.md"]
 description = "A sane way to manage all of your git repositories"
 repository = "https://github.com/edeneast/repo.git"
+documentation = "https://github.com/edeneast/repo.git"
+homepage = "https://github.com/edeneast/repo.git"
+keywords = [
+    'automation',
+    'cli',
+    'developer-tools',
+    'git',
+    'productivity',
+    'workspace',
+]
 license = "Apache-2.0"
 readme = "readme.md"
 
