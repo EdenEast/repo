@@ -30,13 +30,11 @@ with repo and manage your workspace.
 
 ## Installation
 
-Currently repo is only available from source. To this end make sure that you have a rust environment
-setup. If you are new to rust and want more information on setting up a development environment
-check the [rust book's][rust-setup] setup chapter.
+Install the latest released version of repo from crates.io with cargo. If you don't have a rust
+environment setup check the [rust book's][rust-setup] setup chapter.
 
 ```bash
-# Install using cargo
-cargo install --git https://github.com/edeneast/repo
+cargo install repo-cli
 ```
 
 This will install `repo` in your default cargo path `$CARGO_HOME/bin/repo`. Once `repo` is in your
