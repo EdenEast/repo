@@ -1,0 +1,155 @@
+name: release
+on:
+  push:
+      # For testing
+    branches: [cicd/release]
+    tags:
+      - v*
+
+jobs:
+  crates-io-release:
+    name: Publish Crates.io
+    # want to make sure that we can make the release before publishing to crates.io
+    needs: github_release
+    runs-on: ubuntu-latest
+    env:
+      CRATES_IO_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v2
+
+      - name: Install toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+
+      - run: cargo login $CRATES_IO_TOKEN
+      - run: cargo publish --dry-run
+
+  github_build:
+    name: Build release binaries
+    strategy:
+      matrix:
+        target:
+          - x86_64-unknown-linux-gnu
+          - x86_64-unknown-linux-musl
+          - x86_64-apple-darwin
+          - x86_64-pc-windows-msvc
+          - x86_64-pc-windows-gnu
+        include:
+          - target: x86_64-unknown-linux-gnu
+            os: ubuntu-latest
+            name: repo-x86_64-unknown-linux-gnu.tar.gz
+          - target: x86_64-unknown-linux-musl
+            os: ubuntu-latest
+            name: repo-x86_64-unknown-linux-musl.tar.gz
+          - target: x86_64-apple-darwin
+            os: macOS-latest
+            name: repo-x86_64-apple-darwin.tar.gz
+          - target: x86_64-pc-windows-msvc
+            os: windows-latest
+            name: repo-x86_64-pc-windows-msvc.zip
+          - target: x86_64-pc-windows-gnu
+            os: windows-latest
+            name: repo-x86_64-pc-windows-gnu.zip
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v2
+
+      - name: Install toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+
+      - name: Install musl
+        if: matrix.target == 'x86_64-unknown-linux-musl'
+        run: sudo apt-get install -y musl-tools
+
+      - name: Build target
+        uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args: --release --target ${{ matrix.target }}
+
+      - name: Prepare build artifacts [Windows]
+        if: matrix.os == 'windows-latest'
+        run: |
+          cd target/${{ matrix.target }}/release
+          strip repo.exe
+          7z a ../../../${{ matrix.name }} repo.exe
+          cd -
+
+      - name: Prepare build artifacts [unix]
+        if: matrix.os != 'windows-latest'
+        run: |
+          cd target/${{ matrix.target }}/release
+          strip repo
+          tar czvf ../../../${{ matrix.name }} repo
+          cd -
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v1
+        with:
+          name: ${{ matrix.name }}
+          path: ${{ matrix.name }}
+
+  github_release:
+    name: Create github release
+    needs: github_build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v2
+
+      # These can be squashed when https://github.com/actions/download-artifact/issues/6 is closed (@v2)
+      - name: Download release from github_build
+        uses: actions/download-artifact@v1
+        with:
+          name: repo-x86_64-unknown-linux-gnu.tar.gz
+          path: .
+      - name: Download release from github_build
+        uses: actions/download-artifact@v1
+        with:
+          name: repo-x86_64-unknown-linux-musl.tar.gz
+          path: .
+      - name: Download release from github_build
+        uses: actions/download-artifact@v1
+        with:
+          name: repo-x86_64-apple-darwin.tar.gz
+          path: .
+      - name: Download release from github_build
+        uses: actions/download-artifact@v1
+        with:
+          name: repo-x86_64-pc-windows-msvc.zip
+          path: .
+      - name: Download release from github_build
+        uses: actions/download-artifact@v1
+        with:
+          name: repo-x86_64-pc-windows-gnu.zip
+          path: .
+
+      - name: Generate checksums
+        run: for file in repo-*; do openssl dgst -sha256 -r "$file" | awk '{print $1}' > "${file}.sha256"; done
+
+      - name: Create github release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            repo-x86_64-unknown-linux-gnu.tar.gz
+            repo-x86_64-unknown-linux-gnu.tar.gz.sha256
+            repo-x86_64-unknown-linux-musl.tar.gz
+            repo-x86_64-unknown-linux-musl.tar.gz.sha256
+            repo-x86_64-apple-darwin.tar.gz
+            repo-x86_64-apple-darwin.tar.gz.sha256
+            repo-x86_64-pc-windows-msvc.zip
+            repo-x86_64-pc-windows-msvc.zip.sha256
+            repo-x86_64-pc-windows-gnu.zip
+            repo-x86_64-pc-windows-gnu.zip.sha256
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
