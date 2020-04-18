@@ -21,6 +21,10 @@ readme = "readme.md"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[features]
+# Vendor OpenSSL, use this if you have trouble cross-compiling starship
+tls-vendored = ["native-tls/vendored"]
+
 [dependencies]
 anyhow = "^1.0.28"
 better-panic = "^0.2.0"
@@ -40,6 +44,9 @@ serde_json = "~1.0.51"
 shellexpand = "^2.0.0"
 toml = "^0.5.6"
 url = { version = "^2.1.1", features = ["serde"] }
+
+# optional
+native-tls = { version = "0.2", optional = true }
 
 [[bin]]
 name = "repo"
