@@ -50,7 +50,7 @@ your shell's cwd. The work command has [fzf] integration. If you have `fzf` inst
 
 # With `fzf` integration
 [ -x "$(command -v repo)" ] && {
-    [ -x "$(command -v fzf)"] && eval "$(repo init bash --fzf)" || eval "$(repo init bash)"
+    [ -x "$(command -v fzf)" ] && eval "$(repo init bash --fzf)" || eval "$(repo init bash)"
 }
 ```
 
@@ -62,7 +62,7 @@ your shell's cwd. The work command has [fzf] integration. If you have `fzf` inst
 
 # With `fzf` integration
 [ -x "$(command -v repo)" ] && {
-    [ -x "$(command -v fzf)"] && eval "$(repo init zsh --fzf)" || eval "$(repo init zsh)"
+    [ -x "$(command -v fzf)" ] && eval "$(repo init zsh --fzf)" || eval "$(repo init zsh)"
 }
 ```
 
