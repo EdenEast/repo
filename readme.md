@@ -2,6 +2,7 @@
 
 [![Continuous Integration][build-image]][build-link]
 [![Dependabot][dependabot-image]][dependabot-link]
+[![Crates.io][crates-io-image]][crates-io-link]
 ![Apachie 2.0][license-image]
 
 Repo is a command line repository management tool written in rust. Track your remote repositories
@@ -274,6 +275,8 @@ See [LICENSE](./LICENSE) file for more details.
 [license-image]: https://img.shields.io/badge/license-Apache2.0-blue.svg
 [dependabot-image]: https://api.dependabot.com/badges/status?host=github&repo=EdenEast/repo
 [dependabot-link]: https://dependabot.com
+[crates-io-image]: https://img.shields.io/crates/v/repo-cli
+[crates-io-link]: https://crates.io/crates/repo-cli
 
 [//]: # (general)
 
