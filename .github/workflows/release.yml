@@ -26,7 +26,7 @@ jobs:
           override: true
 
       - run: cargo login $CRATES_IO_TOKEN
-      - run: cargo publish --dry-run
+      - run: cargo publish
 
   github_build:
     name: Build release binaries
