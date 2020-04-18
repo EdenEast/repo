@@ -37,7 +37,6 @@ jobs:
           - x86_64-unknown-linux-musl
           - x86_64-apple-darwin
           - x86_64-pc-windows-msvc
-          - x86_64-pc-windows-gnu
         include:
           - target: x86_64-unknown-linux-gnu
             os: ubuntu-latest
@@ -51,9 +50,6 @@ jobs:
           - target: x86_64-pc-windows-msvc
             os: windows-latest
             name: repo-x86_64-pc-windows-msvc.zip
-          - target: x86_64-pc-windows-gnu
-            os: windows-latest
-            name: repo-x86_64-pc-windows-gnu.zip
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout sources
@@ -135,11 +131,6 @@ jobs:
         uses: actions/download-artifact@v1
         with:
           name: repo-x86_64-pc-windows-msvc.zip
-          path: .
-      - name: Download release from github_build
-        uses: actions/download-artifact@v1
-        with:
-          name: repo-x86_64-pc-windows-gnu.zip
           path: .
 
       - name: Generate checksums
