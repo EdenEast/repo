@@ -1,6 +1,6 @@
 [package]
 name = "repo-cli"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["James Simpson <edenofest@gmail.com>"]
 edition = "2018"
 include = ["src/**/**", "Cargo.toml", "Cargo.lock", "readme.md"]
