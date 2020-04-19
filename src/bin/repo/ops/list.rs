@@ -1,9 +1,10 @@
 use super::CliCommand;
 use anyhow::Result;
-use clap::{App, AppSettings, Arg, ArgMatches};
+use clap::{values_t, App, AppSettings, Arg, ArgMatches};
 use repo_cli::prelude::*;
 
 pub struct ListCommand {
+    tags: Option<Vec<String>>,
     local: bool,
     global: bool,
     all: bool,
@@ -32,10 +33,20 @@ impl CliCommand for ListCommand {
                     .short("a")
                     .conflicts_with_all(&["local", "global"]),
             )
+            .arg(
+                Arg::with_name("tag")
+                    .help("Show repositories that contain a tag")
+                    .long("tag")
+                    .short("t")
+                    .takes_value(true)
+                    .multiple(true)
+                    .number_of_values(1),
+            )
     }
 
     fn from_matches(m: &ArgMatches) -> Result<Box<Self>> {
         Ok(Box::new(Self {
+            tags: values_t!(m, "tag", String).ok(),
             local: m.is_present("local"),
             global: m.is_present("global"),
             all: m.is_present("all"),
@@ -45,7 +56,7 @@ impl CliCommand for ListCommand {
     fn run(self, _: &ArgMatches) -> Result<()> {
         let workspace = Workspace::new()?;
 
-        let repositories = match (self.global, self.local, self.all) {
+        let mut repositories = match (self.global, self.local, self.all) {
             (true, false, false) => workspace
                 .repositories()
                 .into_iter()
@@ -59,6 +70,13 @@ impl CliCommand for ListCommand {
             (false, false, true) => workspace.cache().repositories(),
             _ => workspace.repositories(),
         };
+
+        if let Some(tags) = self.tags {
+            repositories = repositories
+                .into_iter()
+                .filter(|r| tags.iter().any(|t| r.tags.contains(t)))
+                .collect();
+        }
 
         let names: Vec<&str> = repositories
             .iter()

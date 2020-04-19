@@ -137,6 +137,8 @@ _arguments "${_arguments_options[@]}" \
 ;;
 (list)
 _arguments "${_arguments_options[@]}" \
+'*-t+[Show repositories that contain a tag]: :_repo_tags' \
+'*--tag=[Show repositories that contain a tag]: :_repo_tags' \
 '-l[Show only local repositories]' \
 '--local[Show only local repositories]' \
 '-g[Show only global repositories]' \
