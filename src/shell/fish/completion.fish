@@ -53,6 +53,7 @@ complete -c repo -n "__fish_seen_subcommand_from foreach" -s a -l all -d 'Perfor
 complete -c repo -n "__fish_seen_subcommand_from inspect" -s f -l format -d 'Define the output format of the inspection'
 complete -c repo -n "__fish_seen_subcommand_from inspect" -x -a "bash ron toml"
 
+complete -c repo -n "__fish_seen_subcommand_from list" -s t -l tag -d 'Show repositories that contain a tag'
 complete -c repo -n "__fish_seen_subcommand_from list" -s l -l local -d 'Show only local repositories'
 complete -c repo -n "__fish_seen_subcommand_from list" -s g -l global -d 'Show only global repositories'
 complete -c repo -n "__fish_seen_subcommand_from list" -s a -l all -d 'Show all repositories regardless of config filters'
