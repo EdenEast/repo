@@ -197,6 +197,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "console"
+version = "0.11.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "dea0f3e2e8d7dba335e913b97f9e1992c86c4399d54f8be1d31c8727d0652064"
+dependencies = [
+ "encode_unicode",
+ "lazy_static",
+ "libc",
+ "regex",
+ "terminal_size",
+ "termios",
+ "unicode-width",
+ "winapi",
+ "winapi-util",
+]
+
+[[package]]
 name = "constant_time_eq"
 version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -231,11 +248,22 @@ dependencies = [
 
 [[package]]
 name = "dialoguer"
-version = "0.5.0"
+version = "0.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "94616e25d2c04fc97253d145f6ca33ad84a584258dc70c4e621cc79a57f903b6"
+checksum = "d8b5eb0fce3c4f955b8d8d864b131fb8863959138da962026c106ba7a2e3bf7a"
 dependencies = [
  "console 0.10.0",
+ "lazy_static",
+ "tempfile",
+]
+
+[[package]]
+name = "dialoguer"
+version = "0.6.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9ceed4036d8881a41295600663da2b2743b4c0db50088392cb7a4c2f26aabf29"
+dependencies = [
+ "console 0.11.2",
  "lazy_static",
  "tempfile",
 ]
@@ -328,7 +356,7 @@ version = "0.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ac1fb05b04760ad0e642a12dd889a1b778becb12fbdb91306c72906ed9461b83"
 dependencies = [
- "dialoguer",
+ "dialoguer 0.5.1",
  "dirs",
  "git2",
 ]
@@ -661,7 +689,7 @@ dependencies = [
  "anyhow",
  "better-panic",
  "clap",
- "dialoguer",
+ "dialoguer 0.6.1",
  "dirs",
  "git2",
  "git2_credentials",
@@ -831,6 +859,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bb6bfa289a4d7c5766392812c0a1f4c1ba45afa1ad47803c11e1f407d846d75f"
 dependencies = [
  "winapi-util",
+]
+
+[[package]]
+name = "terminal_size"
+version = "0.1.12"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8038f95fc7a6f351163f4b964af631bd26c9e828f7db085f2a84aca56f70d13b"
+dependencies = [
+ "libc",
+ "winapi",
 ]
 
 [[package]]
