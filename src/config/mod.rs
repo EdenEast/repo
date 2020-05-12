@@ -12,6 +12,7 @@ pub struct Config {
 #[derive(Debug)]
 pub struct ConfigData {
     root: Option<PathBuf>,
+    root_str: Option<String>,
     cli: Option<bool>,
     host: Option<String>,
     ssh_user: Option<String>,

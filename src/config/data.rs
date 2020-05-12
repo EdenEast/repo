@@ -28,6 +28,7 @@ impl Default for ConfigData {
 
         Self {
             root: Some((*DEFAULT_ROOT).to_path_buf()),
+            root_str: Some(format!("{}", (*DEFAULT_ROOT).display())),
             cli: Some(false),
             host: Some("github.com".to_owned()),
             ssh_user: Some("git".to_owned()),
@@ -44,6 +45,7 @@ impl ConfigData {
     pub fn new() -> Self {
         Self {
             root: None,
+            root_str: None,
             cli: None,
             host: None,
             ssh_user: None,
@@ -55,10 +57,12 @@ impl ConfigData {
         }
     }
     fn from_raw(raw: RawConfigData) -> Result<Self> {
+        let root_str = raw.root.clone();
         let root = raw.root.and_then(|path| util::make_path_buf(path).ok());
 
         Ok(Self {
             root,
+            root_str,
             cli: raw.cli,
             host: raw.default_host,
             ssh_user: raw.default_ssh_user,
@@ -95,7 +99,7 @@ impl ConfigData {
         };
 
         RawConfigData {
-            root: self.root.clone().map(|p| format!("{}", p.display())),
+            root: self.root_str.clone(),
             cli: self.cli,
             default_host: self.host.clone(),
             default_ssh_user: self.ssh_user.clone(),

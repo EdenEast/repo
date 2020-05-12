@@ -298,15 +298,17 @@ impl Config {
     // --------------------------------------------------------------------------------------------
     // Set functions for config command
 
-    pub fn set_root(&mut self, path: PathBuf, location: Option<Location>) {
+    pub fn set_root(&mut self, raw: &str, path: PathBuf, location: Option<Location>) {
         if let Some(l) = location {
             if l == Location::Local {
+                self.local.root_str = Some(raw.to_owned());
                 self.local.root = Some(path);
                 return;
             }
         }
 
         self.global.root = Some(path);
+        self.global.root_str = Some(raw.to_owned());
     }
 
     pub fn set_cli(&mut self, value: bool, location: Option<Location>) {
