@@ -1,7 +1,7 @@
 use super::CliCommand;
 use anyhow::Result;
 use clap::{values_t, App, AppSettings, Arg, ArgMatches};
-use dialoguer::Confirmation;
+use dialoguer::Confirm;
 use repo_cli::prelude::*;
 
 pub struct RemoveCommand {
@@ -42,8 +42,8 @@ impl CliCommand for RemoveCommand {
 
         for name in self.names {
             if !self.force
-                && !Confirmation::new()
-                    .with_text(&format!(
+                && !Confirm::new()
+                    .with_prompt(&format!(
                         "Are you sure you want to remove: '{}' from repo",
                         name
                     ))
