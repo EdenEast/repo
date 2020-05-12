@@ -205,7 +205,7 @@ impl ConfigCommand {
         };
 
         match name {
-            "root" => config.set_root(PathBuf::from_str(value)?, location),
+            "root" => config.set_root(value, PathBuf::from_str(value)?, location),
             "cli" => config.set_cli(value.parse()?, location),
             "host" => config.set_host(value, location),
             "ssh" => config.set_ssh(value, location),
