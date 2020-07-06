@@ -243,6 +243,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "dirs"
+version = "3.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "142995ed02755914747cc6ca76fc7e4583cd18578746716d0508ea6ed558b9ff"
+dependencies = [
+ "dirs-sys",
+]
+
+[[package]]
 name = "dirs-sys"
 version = "0.3.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -326,7 +335,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "17f3f10b0ddf91b9ee499346534a1a2a8f01b4b5ac9f0e40a1d5075b7f317c21"
 dependencies = [
  "dialoguer",
- "dirs",
+ "dirs 2.0.2",
  "git2",
 ]
 
@@ -665,7 +674,7 @@ dependencies = [
  "better-panic",
  "clap",
  "dialoguer",
- "dirs",
+ "dirs 3.0.1",
  "git2",
  "git2_credentials",
  "glob",
@@ -787,7 +796,7 @@ version = "2.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9a2b22262a9aaf9464d356f656fea420634f78c881c5eebd5ef5e66d8b9bc603"
 dependencies = [
- "dirs",
+ "dirs 2.0.2",
 ]
 
 [[package]]
