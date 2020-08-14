@@ -27,7 +27,7 @@ tls-vendored = ["native-tls/vendored"]
 [dependencies]
 anyhow = "^1.0.32"
 better-panic = "^0.2.0"
-clap = "^2.33.2"
+clap = "^2.33.3"
 dialoguer = "^0.6.2"
 dirs = "^3.0.1"
 git2 = "^0.13.8"
