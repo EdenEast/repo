@@ -18,11 +18,15 @@ keywords = [
 license = "Apache-2.0"
 readme = "readme.md"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [features]
 # Vendor OpenSSL, use this if you have trouble cross-compiling starship
 tls-vendored = ["native-tls/vendored"]
+
+[profile.release] # min rust size resource https://github.com/johnthagen/min-sized-rus
+codegen-units = 1 # There are some optimizations that prevented with multi units
+lto = true        # Optimize the result in the linking phase
+opt-level = 'z'   # Optimize for size
+panic = 'abort'   # Remove stack unwinding code for panic
 
 [dependencies]
 anyhow = "^1.0.32"
