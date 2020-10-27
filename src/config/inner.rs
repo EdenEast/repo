@@ -21,7 +21,7 @@ lazy_static! {
             util::make_path_buf(path).expect("failed to convert REPO_CONFIG_PATH into a PathBuf")
         }
         Err(_) => {
-            dirs::config_dir()
+            dirs_next::config_dir()
                 .map(|path| path.join("repo"))
                 .unwrap_or_else(|| {
                     util::make_path_buf("~/.config/repo")
@@ -34,7 +34,7 @@ lazy_static! {
             util::make_path_buf(path).expect("failed to convert REPO_LOCAL_PATH into a PathBuf")
         }
         Err(_) => {
-            dirs::data_local_dir()
+            dirs_next::data_local_dir()
                 .map(|path| path.join("repo"))
                 .unwrap_or_else(|| {
                     util::make_path_buf("~/.local/share/repo")

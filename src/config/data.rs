@@ -13,7 +13,7 @@ use std::{
 };
 
 lazy_static! {
-    pub static ref DEFAULT_ROOT: PathBuf = dirs::home_dir()
+    pub static ref DEFAULT_ROOT: PathBuf = dirs_next::home_dir()
         .map(|path| path.join("repo"))
         .unwrap_or_else(|| {
             util::make_path_buf("~/repo").expect("failed to determine default root directory")
