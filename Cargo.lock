@@ -202,6 +202,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "console"
+version = "0.13.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a50aab2529019abfabfa93f1e6c41ef392f91fbf179b347a7e96abb524884a08"
+dependencies = [
+ "encode_unicode",
+ "lazy_static",
+ "libc",
+ "regex",
+ "terminal_size",
+ "unicode-width",
+ "winapi",
+ "winapi-util",
+]
+
+[[package]]
 name = "constant_time_eq"
 version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -243,6 +259,18 @@ dependencies = [
  "console 0.11.3",
  "lazy_static",
  "tempfile",
+]
+
+[[package]]
+name = "dialoguer"
+version = "0.7.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "70f807b2943dc90f9747497d9d65d7e92472149be0b88bf4ce1201b4ac979c26"
+dependencies = [
+ "console 0.13.0",
+ "lazy_static",
+ "tempfile",
+ "zeroize",
 ]
 
 [[package]]
@@ -359,7 +387,7 @@ version = "0.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "17f3f10b0ddf91b9ee499346534a1a2a8f01b4b5ac9f0e40a1d5075b7f317c21"
 dependencies = [
- "dialoguer",
+ "dialoguer 0.6.2",
  "dirs",
  "git2",
 ]
@@ -707,7 +735,7 @@ dependencies = [
  "anyhow",
  "better-panic",
  "clap",
- "dialoguer",
+ "dialoguer 0.7.1",
  "dirs-next",
  "git2",
  "git2_credentials",
@@ -1015,3 +1043,9 @@ name = "winapi-x86_64-pc-windows-gnu"
 version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "712e227841d057c1ee1cd2fb22fa7e5a5461ae8e48fa2ca79ec42cfc1931183f"
+
+[[package]]
+name = "zeroize"
+version = "0.9.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "45af6a010d13e4cf5b54c94ba5a2b2eba5596b9e46bf5875612d332a1f2b3f86"
