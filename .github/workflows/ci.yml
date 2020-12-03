@@ -11,26 +11,6 @@ on:
       - "**.md"
 
 jobs:
-  cargo_check:
-    name: Compile
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout sources
-        uses: actions/checkout@v2
-
-      - name: Install toolchain
-        uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: stable
-          override: true
-
-      - name: Check compile
-        uses: actions-rs/cargo@v1
-        with:
-          comand: check
-          args: --all
-
   rustfmt:
     name: Rustfmt [Formatter]
     runs-on: ubuntu-latest
@@ -75,13 +55,13 @@ jobs:
 
   test:
     name: Test Suite
-    needs: [cargo_check]
+    needs: [rustfmt, clippy]
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macOs-latest, windows-latest]
-        rust: [stable, nightly, 1.40.0]
+        rust: [stable, 1.40.0]
     steps:
       - uses: actions/checkout@v2
 
