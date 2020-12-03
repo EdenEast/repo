@@ -92,7 +92,7 @@ impl CliCommand for ConfigCommand {
 
         match (self.name.as_ref(), self.value.as_ref()) {
             (Some(name), Some(value)) => self.set_value(name, value, config)?,
-            (Some(name), None) => self.get_value(name, config)?,
+            (Some(name), None) => self.get_value(name, config),
             _ => self.no_value(config)?,
         };
 
@@ -165,7 +165,7 @@ impl ConfigCommand {
         Ok(())
     }
 
-    fn get_value(&self, name: &str, config: &Config) -> Result<()> {
+    fn get_value(&self, name: &str, config: &Config) {
         let location = match (self.local, self.global) {
             (true, false) => Some(Location::Local),
             (false, true) => Some(Location::Global),
@@ -194,7 +194,6 @@ impl ConfigCommand {
                 std::process::exit(1);
             }
         }
-        Ok(())
     }
 
     fn set_value(&self, name: &str, value: &str, config: &mut Config) -> Result<()> {

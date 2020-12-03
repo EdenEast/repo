@@ -56,11 +56,11 @@ impl ConfigData {
             path: None,
         }
     }
-    fn from_raw(raw: RawConfigData) -> Result<Self> {
+    fn from_raw(raw: RawConfigData) -> Self {
         let root_str = raw.root.clone();
         let root = raw.root.and_then(|path| util::make_path_buf(path).ok());
 
-        Ok(Self {
+        Self {
             root,
             root_str,
             cli: raw.cli,
@@ -71,7 +71,7 @@ impl ConfigData {
             include: raw.include.unwrap_or_default(),
             exclude: raw.exclude.unwrap_or_default(),
             path: Some(raw.path),
-        })
+        }
     }
 
     pub fn to_string_pretty(&self) -> Result<String> {
@@ -121,13 +121,12 @@ impl ConfigData {
             content
         ))?;
         raw.path = PathBuf::from(path.as_ref().parent().unwrap());
-        raw.try_into()
+        Ok(raw.into())
     }
 }
 
-impl TryFrom<RawConfigData> for ConfigData {
-    type Error = anyhow::Error;
-    fn try_from(raw: RawConfigData) -> Result<Self> {
+impl From<RawConfigData> for ConfigData {
+    fn from(raw: RawConfigData) -> Self {
         Self::from_raw(raw)
     }
 }
