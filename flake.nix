@@ -5,13 +5,17 @@
   inputs = {
     utils.url = "github:numtide/flake-utils";
     naersk.url = "github:nmattia/naersk";
+    flake-compat = {
+      url = "github:edolstra/flake-compat";
+      flake = false;
+    };
     mozillapkgs = {
       url = "github:mozilla/nixpkgs-mozilla";
       flake = false;
     };
   };
 
-  outputs = { self, nixpkgs, utils, naersk, mozillapkgs }:
+  outputs = { self, nixpkgs, utils, naersk, mozillapkgs, flake-compat }:
     utils.lib.eachDefaultSystem (system:
       let
         manifest = builtins.fromTOML (builtins.readFile ./Cargo.toml);
