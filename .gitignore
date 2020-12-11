@@ -4,6 +4,7 @@
 # Edit at https://www.gitignore.io/?templates=linux,visualstudiocode,rust,vim,windows
 
 package/
+/result
 
 ### Linux ###
 *~
