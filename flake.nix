@@ -58,11 +58,11 @@
 
         # `nix run`
         apps."${pname}" = utils.lib.mkApp { drv = packages."${pname}"; };
-
         defaultApp = apps."${pname}";
 
         # `nix develop`
         devShell = pkgs.mkShell {
+          inherit buildInputs;
           # supply the specific rust version
           nativeBuildInputs = with pkgs; [ rust ];
         };
