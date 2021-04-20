@@ -93,10 +93,7 @@ impl ConfigData {
             Some(self.exclude.iter().cloned().collect())
         };
 
-        let shell = match &self.shell {
-            Some(shell) => Some(shell.to_vec()),
-            None => None,
-        };
+        let shell = self.shell.as_ref().map(|shell| shell.to_vec());
 
         RawConfigData {
             root: self.root_str.clone(),

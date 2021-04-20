@@ -98,14 +98,11 @@ impl CliCommand for EditCommand {
     }
 
     fn from_matches(m: &ArgMatches) -> Result<Box<Self>> {
-        let pri: Option<Result<i32>> = match m.value_of("priority") {
-            Some(s) => Some(
-                s.parse()
-                    .context("converting priority option from user")
-                    .map_err(Into::into),
-            ),
-            None => None,
-        };
+        let pri: Option<Result<i32>> = m.value_of("priority").map(|s| {
+            s.parse()
+                .context("converting priority option from user")
+                .map_err(Into::into)
+        });
 
         let priority = match pri {
             Some(result) => {

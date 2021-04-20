@@ -37,8 +37,8 @@ impl FromStr for ScpPath {
             .to_owned();
 
         Ok(Self {
-            username,
             host,
+            username,
             path,
         })
     }
@@ -51,6 +51,7 @@ impl ScpPath {
     }
 }
 
+#[allow(clippy::from_over_into)]
 impl Into<Url> for ScpPath {
     fn into(self) -> Url {
         self.to_url()
