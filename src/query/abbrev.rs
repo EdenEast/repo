@@ -50,7 +50,7 @@ impl FromStr for AbbrevUrl {
 
         let captures = regex
             .captures(s)
-            .ok_or_else(|| anyhow!("path: {} does not match Abbrev url regex"))?;
+            .ok_or_else(|| anyhow!("path: {} does not match Abbrev url regex", s))?;
 
         let username = captures.get(1).map(|s| s.as_str().to_owned()).unwrap();
         let path = captures.get(2).map(|s| s.as_str().to_owned()).unwrap();

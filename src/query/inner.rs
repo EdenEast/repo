@@ -36,6 +36,6 @@ impl FromStr for Query {
         } else if let Ok(abbrev) = AbbrevUrl::parse(s) {
             return Ok(Query::Abbrev(abbrev));
         }
-        Err(anyhow!("'{}' invalid query not url or scp path"))
+        Err(anyhow!("'{}' invalid query not url or scp path", s))
     }
 }
