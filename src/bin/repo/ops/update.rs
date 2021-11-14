@@ -81,7 +81,7 @@ impl CliCommand for UpdateCommand {
         }
 
         for repository in repositories {
-            workspace.update_remotes(&repository)?;
+            workspace.update_remotes(repository)?;
         }
 
         Ok(())

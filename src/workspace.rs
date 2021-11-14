@@ -81,8 +81,8 @@ impl Workspace {
     }
 
     pub fn get_repository(&self, name: &str) -> Option<&Repository> {
-        if let Some(repo) = self.cache.get_repository(&name) {
-            if self.filter_repository(&repo) {
+        if let Some(repo) = self.cache.get_repository(name) {
+            if self.filter_repository(repo) {
                 return Some(repo);
             }
         }
@@ -91,7 +91,7 @@ impl Workspace {
     }
 
     pub fn take_repository(&mut self, name: &str) -> Option<Repository> {
-        if let Some(repo) = self.cache.take_repository(&name) {
+        if let Some(repo) = self.cache.take_repository(name) {
             if self.filter_repository(&repo) {
                 return Some(repo);
             }
@@ -101,29 +101,29 @@ impl Workspace {
     }
 
     pub fn get_tag(&mut self, name: &str) -> Option<&Tag> {
-        self.cache.get_tag(&name)
+        self.cache.get_tag(name)
     }
 
     pub fn take_tag(&mut self, name: &str) -> Option<Tag> {
-        self.cache.take_tag(&name)
+        self.cache.take_tag(name)
     }
 
     pub fn has_repository(&self, name: &str) -> bool {
-        self.cache.has_repository(&name)
+        self.cache.has_repository(name)
     }
 
     pub fn has_tag(&self, name: &str) -> bool {
-        self.cache.has_tag(&name)
+        self.cache.has_tag(name)
     }
 
     pub fn remove_repository(&mut self, name: &str) -> Result<()> {
         debug!("Removing repository: '{}' from cache", name);
-        self.cache.remove_repository(&name)
+        self.cache.remove_repository(name)
     }
 
     pub fn remove_tag(&mut self, name: &str) -> Result<()> {
         debug!("Removing tag: '{}' from cache", name);
-        self.cache.remove_tag(&name)
+        self.cache.remove_tag(name)
     }
 
     pub fn update_remotes(&self, repository: &Repository) -> Result<()> {

@@ -179,21 +179,21 @@ impl CliCommand for AddCommand {
             Location::Global
         };
 
-        if workspace.has_repository(&name) {
+        if workspace.has_repository(name) {
             if !self.force {
                 return Err(anyhow!(
                     "'{}' already exist in repo. If not visible 'list' then check config filters. --force to override",
                     &name
                 ));
             } else {
-                workspace.remove_repository(&name)?;
+                workspace.remove_repository(name)?;
             }
         }
 
         let query = Query::parse(&self.url)?;
-        let url = query.to_url(&workspace.config());
+        let url = query.to_url(workspace.config());
 
-        let mut builder = RepositoryBuilder::new(&name)
+        let mut builder = RepositoryBuilder::new(name)
             .remote(Remote::new(url))
             .location(location);
 
@@ -215,7 +215,7 @@ impl CliCommand for AddCommand {
                 }
 
                 let q = Query::parse(split[1])?;
-                let remote = Remote::with_name(split[0], q.to_url(&workspace.config()));
+                let remote = Remote::with_name(split[0], q.to_url(workspace.config()));
                 builder = builder.remote(remote);
             }
         }

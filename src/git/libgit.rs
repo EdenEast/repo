@@ -63,7 +63,7 @@ where
     let repo = RepoBuilder::new()
         .with_checkout(checkout)
         .fetch_options(fetch)
-        .clone(url, &path)?;
+        .clone(url, path)?;
 
     for remote in remotes.iter().skip(1) {
         repo.remote(&remote.name, remote.url.as_str())?;

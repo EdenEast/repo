@@ -33,7 +33,7 @@ where
         let command = format!("git remote add {} {}", name, url);
         debug!("Executing: {}", command);
         process::inherit("git")
-            .args(&["remote", "add", &name, url])
+            .args(&["remote", "add", name, url])
             .current_dir(&path)
             .status()
             .map_err(Into::into)

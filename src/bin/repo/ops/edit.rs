@@ -189,7 +189,7 @@ impl CliCommand for EditCommand {
                 }
 
                 let q = Query::parse(split[1])?;
-                let remote = Remote::with_name(split[0], q.to_url(&workspace.config()));
+                let remote = Remote::with_name(split[0], q.to_url(workspace.config()));
                 if repository.remotes.iter().any(|r| r.name == remote.name) {
                     bail!("remote name: {} already exists in repository", remote.name);
                 }

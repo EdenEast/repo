@@ -15,7 +15,7 @@ impl Query {
         match self {
             Query::Url(url) => url.clone(),
             Query::Scp(scp) => scp.to_url(),
-            Query::Abbrev(abbrev) => abbrev.to_url(&config),
+            Query::Abbrev(abbrev) => abbrev.to_url(config),
         }
     }
 }
