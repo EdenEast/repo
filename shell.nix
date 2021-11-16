@@ -28,7 +28,9 @@ pkgs.mkShell {
     rustfmt-preview
     clippy-preview
     mdbook
-  ];
+    libiconv # needed for git2 (libgit2)
+  ] ++ (lib.optionals pkgs.stdenv.isDarwin [ darwin.apple_sdk.frameworks.Security ]);
 
+  CARGO_BUILD_RUSTFLAGS = if pkgs.stdenv.isDarwin then "-C rpath" else null;
   RUST_SRC_PATH = "${pkgs.rust-src}/lib/rustlib/src/rust/library";
 }
