@@ -29,7 +29,7 @@ opt-level = 'z'   # Optimize for size
 panic = 'abort'   # Remove stack unwinding code for panic
 
 [dependencies]
-anyhow = "^1.0.48"
+anyhow = "^1.0.50"
 better-panic = "^0.2.0"
 clap = "^2.33.3"
 dialoguer = "^0.8.0"
