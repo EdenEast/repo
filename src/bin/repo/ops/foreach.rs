@@ -91,7 +91,7 @@ impl CliCommand for ForeachCommand {
                 .collect::<Vec<&Repository>>();
         }
 
-        // NOTE: For now format! macro cannot dynamicly format padding. Would
+        // NOTE: For now format! macro cannot dynamically format padding. Would
         // have to use some template engine to accomplish this. Dont have to iterate
         // to find the largest name for now
         //

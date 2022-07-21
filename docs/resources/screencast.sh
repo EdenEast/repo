@@ -2,7 +2,7 @@
 # Script base was taken from 'sharkdp/fd' found here 'https://github.com/sharkdp/fd/blob/v7.5.0/doc/screencast.sh'
 # When I saw this I was very excited as I dont have to constantly restart recording because I messed up typing
 #
-# Useage: This script is padded to terminalizer:
+# Usage: This script is padded to terminalizer:
 # `terminalizer record --command ./docs/screencast.sh demo`
 
 # Designed to be executed via svg-term from the fd root directory:
