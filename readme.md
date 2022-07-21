@@ -136,7 +136,7 @@ a tag. This comes in useful when you use your personal dotfiles on a work machin
 use repo to manage your internal work's repo and you want to filter out your personal repos so they
 are not accessible on your work machine. You can add a `personal` tag to all of your personal repos
 and exclude that tag in your local work's configuration cache. This would filter out all of your
-personal repos on your work machine making sure that you cant pull anything on your work machine.
+personal repos on your work machine making sure that you can't pull anything on your work machine.
 
 #### Example
 

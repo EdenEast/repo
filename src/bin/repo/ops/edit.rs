@@ -105,10 +105,10 @@ impl CliCommand for EditCommand {
                 Arg::with_name("remote")
                     .help("Add an additional remote")
                     .long_help(
-                        "Add an additional remote. Remote will be appened to the repository as an additional remote\n\
+                        "Add an additional remote. Remote will be appended to the repository as an additional remote\n\
                         This is useful if the repository is a fork, letting you link to the upstream remote.\n\
                         Repo uses the first remote in it's list as the default remote. By convention the\n\
-                        first remote is 'origin'. Remote's argument format is name and url seperated by a ','")
+                        first remote is 'origin'. Remote's argument format is name and url separated by a ','")
                     .long("remote")
                     .short("r")
                     .takes_value(true)

@@ -111,7 +111,7 @@ pub mod process {
 
             // TODO: Have computed the larget string before calling this
             // but format does not allow formatting with dynamic variables.
-            // This means that I cant format left based on the max_size
+            // This means that I can't format left based on the max_size
             let prefix = format!("{:>20.20} |", prefix);
             print!("{} {}", prefix, line);
         }
