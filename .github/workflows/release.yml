@@ -1,7 +1,7 @@
 name: release
 on:
   push:
-      # For testing
+    # For testing
     branches: [cicd/release]
     tags:
       - v*
@@ -16,14 +16,13 @@ jobs:
       CRATES_IO_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}
     steps:
       - name: Checkout sources
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Install toolchain
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@stable
         with:
           profile: minimal
           toolchain: stable
-          override: true
 
       - run: cargo login $CRATES_IO_TOKEN
       - run: cargo publish
@@ -53,14 +52,12 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout sources
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Install toolchain
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@stable
         with:
-          profile: minimal
           toolchain: stable
-          override: true
           target: ${{ matrix.target }}
 
       - name: Install musl
@@ -69,17 +66,11 @@ jobs:
 
       - name: Build target
         if: matrix.target != 'x86_64-unknown-linux-musl'
-        uses: actions-rs/cargo@v1
-        with:
-          command: build
-          args: --release --target ${{ matrix.target }}
+        run: cargo build --release --target ${{ matrix.target }}
 
       - name: Build target (musl)
         if: matrix.target == 'x86_64-unknown-linux-musl'
-        uses: actions-rs/cargo@v1
-        with:
-          command: build
-          args: --release --features tls-vendored --target ${{ matrix.target }}
+        run: cargo build --release --features tls-vendored --target ${{ matrix.target }}
 
       - name: Prepare build artifacts [Windows]
         if: matrix.os == 'windows-latest'
@@ -109,7 +100,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout sources
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       # These can be squashed when https://github.com/actions/download-artifact/issues/6 is closed (@v2)
       - name: Download release from github_build
@@ -152,4 +143,3 @@ jobs:
             repo-x86_64-pc-windows-gnu.zip.sha256
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
