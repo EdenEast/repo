@@ -25,8 +25,8 @@ pkgs.mkShell {
     rust-analyzer
     pkg-config
     openssl
-    rustfmt-preview
-    clippy-preview
+    rustfmt
+    clippy
     mdbook
     libiconv # needed for git2 (libgit2)
   ] ++ (lib.optionals pkgs.stdenv.isDarwin [ darwin.apple_sdk.frameworks.Security ]);
