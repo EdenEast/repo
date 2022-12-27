@@ -1,34 +1,32 @@
 name: release
 on:
   push:
-    # For testing
-    branches: [cicd/release]
-    tags:
-      - v*
+    branches:
+      - main
+
+env:
+  CARGO_INCREMENTAL: 0
 
 jobs:
-  crates-io-release:
-    name: Publish Crates.io
-    # want to make sure that we can make the release before publishing to crates.io
-    needs: github_release
+  release_please:
+    name: Release please
     runs-on: ubuntu-latest
-    env:
-      CRATES_IO_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
     steps:
-      - name: Checkout sources
-        uses: actions/checkout@v3
-
-      - name: Install toolchain
-        uses: dtolnay/rust-toolchain@stable
+      - uses: google-github-actions/release-please-action@v3
+        id: release
         with:
-          profile: minimal
-          toolchain: stable
-
-      - run: cargo login $CRATES_IO_TOKEN
-      - run: cargo publish
+          token: ${{ secrets.GITHUB_TOKEN }}
+          release-type: rust
+          draft: true
 
   github_build:
     name: Build release binaries
+    needs: release_please
+    if: ${{ needs.release_please.outputs.release_created }}
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         target:
@@ -49,7 +47,6 @@ jobs:
           - target: x86_64-pc-windows-msvc
             os: windows-latest
             name: repo-x86_64-pc-windows-msvc.zip
-    runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout sources
         uses: actions/checkout@v3
@@ -89,57 +86,50 @@ jobs:
           cd -
 
       - name: Upload build artifact
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.name }}
           path: ${{ matrix.name }}
 
-  github_release:
-    name: Create github release
-    needs: github_build
+  upload_artifacts:
+    name: Add build artifacts to release
+    needs:
+      - release_please
+      - github_build
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout sources
-        uses: actions/checkout@v3
-
-      # These can be squashed when https://github.com/actions/download-artifact/issues/6 is closed (@v2)
-      - name: Download release from github_build
-        uses: actions/download-artifact@v1
-        with:
-          name: repo-x86_64-unknown-linux-gnu.tar.gz
-          path: .
-      - name: Download release from github_build
-        uses: actions/download-artifact@v1
-        with:
-          name: repo-x86_64-unknown-linux-musl.tar.gz
-          path: .
-      - name: Download release from github_build
-        uses: actions/download-artifact@v1
-        with:
-          name: repo-x86_64-apple-darwin.tar.gz
-          path: .
-      - name: Download release from github_build
-        uses: actions/download-artifact@v1
-        with:
-          name: repo-x86_64-pc-windows-msvc.zip
-          path: .
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
 
       - name: Generate checksums
         run: for file in repo-*; do openssl dgst -sha256 -r "$file" | awk '{print $1}' > "${file}.sha256"; done
 
-      - name: Create github release
-        uses: softprops/action-gh-release@v1
-        with:
-          files: |
-            repo-x86_64-unknown-linux-gnu.tar.gz
-            repo-x86_64-unknown-linux-gnu.tar.gz.sha256
-            repo-x86_64-unknown-linux-musl.tar.gz
-            repo-x86_64-unknown-linux-musl.tar.gz.sha256
-            repo-x86_64-apple-darwin.tar.gz
-            repo-x86_64-apple-darwin.tar.gz.sha256
-            repo-x86_64-pc-windows-msvc.zip
-            repo-x86_64-pc-windows-msvc.zip.sha256
-            repo-x86_64-pc-windows-gnu.zip
-            repo-x86_64-pc-windows-gnu.zip.sha256
+      - name: Publish release
+        run: gh release edit ${{ needs.release_please.outputs.tag_name }} --draft=false --repo=edeneast/repo
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Add artifacts to release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: repo-*/repo-*
+          tag_name: ${{ needs.release_please.outputs.tag_name }}
+
+  cargo_publish:
+    name: Publish cargo package
+    runs-on: ubuntu-latest
+    needs:
+      - release_please
+      - upload_artifacts
+    if: ${{ needs.release_please.outputs.release_created }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+
+      - name: Publish
+        run: cargo publish --token ${{ secrets.CRATES_IO_TOKEN }}
