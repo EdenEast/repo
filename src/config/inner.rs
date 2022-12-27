@@ -46,7 +46,7 @@ lazy_static! {
 
 impl Config {
     pub fn new() -> Result<Self> {
-        let global_path: &Path = &*GLOBAL_CONFIG_PATH;
+        let global_path: &Path = &GLOBAL_CONFIG_PATH;
         let global_file = global_path.join("config.toml");
 
         debug!("Looking for global config file: {:#?}", global_file);
@@ -60,7 +60,7 @@ impl Config {
             data
         };
 
-        let local_path: &Path = &*LOCAL_CONFIG_PATH;
+        let local_path: &Path = &LOCAL_CONFIG_PATH;
         let local_file = local_path.join("config.toml");
 
         debug!("Looking for local config file: {:#?}", local_file);
@@ -82,11 +82,11 @@ impl Config {
     }
 
     pub fn global_path() -> &'static Path {
-        &*GLOBAL_CONFIG_PATH
+        &GLOBAL_CONFIG_PATH
     }
 
     pub fn local_path() -> &'static Path {
-        &*LOCAL_CONFIG_PATH
+        &LOCAL_CONFIG_PATH
     }
 
     pub fn path(&self, location: Option<Location>) -> &Path {

@@ -72,10 +72,7 @@ impl CliCommand for ListCommand {
         };
 
         if let Some(tags) = self.tags {
-            repositories = repositories
-                .into_iter()
-                .filter(|r| tags.iter().any(|t| r.tags.contains(t)))
-                .collect();
+            repositories.retain(|r| tags.iter().any(|t| r.tags.contains(t)));
         }
 
         let names: Vec<&str> = repositories

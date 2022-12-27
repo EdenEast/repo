@@ -94,13 +94,7 @@ impl CliCommand for AddCommand {
         });
 
         let priority = match pri {
-            Some(result) => {
-                if let Err(e) = result {
-                    return Err(e);
-                }
-
-                Some(result.unwrap())
-            }
+            Some(result) => Some(result?),
             None => None,
         };
 

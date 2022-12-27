@@ -33,7 +33,7 @@ where
         let command = format!("git remote add {} {}", name, url);
         debug!("Executing: {}", command);
         process::inherit("git")
-            .args(&["remote", "add", name, url])
+            .args(["remote", "add", name, url])
             .current_dir(&path)
             .status()
             .map_err(Into::into)
@@ -57,7 +57,7 @@ where
     let path = format!("{}", path.as_ref().display());
     debug!("Executing: git fetch --all --tags");
     process::null("git")
-        .args(&["fetch", "--all", "--tags"])
+        .args(["fetch", "--all", "--tags"])
         .current_dir(&path)
         .status()
         .map_err(Into::into)
@@ -76,7 +76,7 @@ where
 {
     let path = format!("{}", path.as_ref().display());
     process::piped("git")
-        .args(&["merge", branch])
+        .args(["merge", branch])
         .current_dir(&path)
         .status()
         .map_err(Into::into)
@@ -98,7 +98,7 @@ where
 
     // 1. Get current branch ref
     let output = process::piped("git")
-        .args(&["rev-parse", "--abbrev-ref", "HEAD"])
+        .args(["rev-parse", "--abbrev-ref", "HEAD"])
         .current_dir(&path)
         .output()?;
 
@@ -111,7 +111,7 @@ where
     // 2. Check is there is a remote branch
     let refspec = format!("{}@{{upstream}}", branch);
     let output = process::piped("git")
-        .args(&[
+        .args([
             "rev-parse",
             "--abbrev-ref",
             "--symbolic-full-name",
@@ -130,7 +130,7 @@ where
     // 3. Check if upstream is an ansestor of the current local branch
     // If this check is true then we can fast-forward merge local up to upstream
     let status = process::null("git")
-        .args(&["merge-base", "--is-ancestor", &upstream, &branch])
+        .args(["merge-base", "--is-ancestor", &upstream, &branch])
         .current_dir(&path)
         .status()?;
 
@@ -140,7 +140,7 @@ where
 
     // 4. Merge fast-forward
     let status = process::null("git")
-        .args(&["merge", "--ff-only", &upstream])
+        .args(["merge", "--ff-only", &upstream])
         .current_dir(&path)
         .status()?;
 
