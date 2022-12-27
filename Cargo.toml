@@ -30,7 +30,7 @@ panic = 'abort'   # Remove stack unwinding code for panic
 
 [dependencies]
 anyhow = "^1.0.58"
-better-panic = "^0.2.0"
+better-panic = "^0.3.0"
 clap = "^2.34.0"
 dialoguer = "^0.10.1"
 dirs-next = "2.0.0"
