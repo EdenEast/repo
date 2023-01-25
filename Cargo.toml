@@ -31,7 +31,7 @@ panic = 'abort'   # Remove stack unwinding code for panic
 [dependencies]
 anyhow = "^1.0.58"
 better-panic = "^0.2.0"
-clap = "^2.34.0"
+clap = "^4.1.4"
 dialoguer = "^0.10.1"
 dirs-next = "2.0.0"
 git2 = "^0.13.25"
