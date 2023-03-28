@@ -29,24 +29,22 @@ opt-level = 'z'   # Optimize for size
 panic = 'abort'   # Remove stack unwinding code for panic
 
 [dependencies]
-anyhow = "^1.0.58"
-better-panic = "^0.2.0"
-clap = "^2.34.0"
-dialoguer = "^0.10.1"
+anyhow = "1.0.70"
+clap = "2.34.0"
+dialoguer = "0.10.3"
 dirs-next = "2.0.0"
-git2 = "^0.13.25"
-git2_credentials = "^0.7.3"
-glob = "^0.3.0"
-lazy_static = "^1.4.0"
-log = "^0.4.14"
-pretty_env_logger = "^0.4.0"
-regex = "^1.5.4"
-ron = "~0.7.1"
-serde = { version = "~1.0.130", features = ["derive"] }
-serde_json = "~1.0.72"
-shellexpand = "^2.1.0"
-toml = "^0.5.8"
-url = { version = "^2.2.1", features = ["serde"] }
+git2 = "0.16.1"
+git2_credentials = "0.11.0"
+glob = "0.3.1"
+lazy_static = "1.4.0"
+log = "0.4.17"
+pretty_env_logger = "0.4.0"
+regex = "1.7.3"
+serde = { version = "1.0.159", features = ["derive"] }
+serde_json = "1.0.95"
+shellexpand = "3.1.0"
+toml = "0.7.3"
+url = { version = "2.3.1", features = ["serde"] }
 
 # optional
 native-tls = { version = "0.2", optional = true }

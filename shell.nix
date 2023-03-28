@@ -28,6 +28,7 @@ pkgs.mkShell {
     rustfmt-preview
     clippy-preview
     mdbook
+    cargo-bloat
     libiconv # needed for git2 (libgit2)
   ] ++ (lib.optionals pkgs.stdenv.isDarwin [ darwin.apple_sdk.frameworks.Security ]);
 
