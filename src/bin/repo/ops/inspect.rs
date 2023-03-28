@@ -23,7 +23,7 @@ impl CliCommand for InspectCommand {
                     .long("format")
                     .short("f")
                     .takes_value(true)
-                    .possible_values(&["json", "toml", "ron"]),
+                    .possible_values(&["json", "toml"]),
             )
     }
 
@@ -47,7 +47,10 @@ impl CliCommand for InspectCommand {
             let ser = match format.as_str() {
                 "json" => serde_json::to_string_pretty(repository)?,
                 "toml" => toml::to_string_pretty(repository)?,
-                "ron" => ron::ser::to_string_pretty(repository, ron::ser::PrettyConfig::default())?,
+                "ron" => {
+                    eprintln!("`ron` format has been depricated. Use either `toml` or `json`");
+                    std::process::exit(-1);
+                }
                 _ => {
                     bail!("unknown format: {}", format);
                 }
