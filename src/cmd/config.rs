@@ -1,87 +1,12 @@
-use super::CliCommand;
 use anyhow::Result;
-use clap::{App, AppSettings, Arg, ArgMatches, SubCommand};
+use clap::CommandFactory;
 use repo_cli::prelude::*;
 use std::{path::PathBuf, str::FromStr};
 
-pub struct ConfigCommand {
-    name: Option<String>,
-    value: Option<String>,
-    local: bool,
-    global: bool,
-    remove: bool,
-    edit: bool,
-    list: bool,
-    name_only: bool,
-}
+use super::{ConfigCmd, Run};
 
-impl CliCommand for ConfigCommand {
-    fn app<'a, 'b: 'a>(app: App<'a, 'b>) -> App<'a, 'b> {
-        app.about("Get or set configuration options")
-            .settings(&[AppSettings::NextLineHelp])
-            .arg(Arg::with_name("NAME").help("Name of configuration option"))
-            .arg(
-                Arg::with_name("VALUE")
-                    .help("Value to be set to the configuration option provided"),
-            )
-            .arg(
-                Arg::with_name("local")
-                    .help("Interact with local config.")
-                    .long("local")
-                    .short("l")
-                    .conflicts_with("global"),
-            )
-            .arg(
-                Arg::with_name("global")
-                    .help("Interact with global config")
-                    .long("global")
-                    .short("g")
-                    .conflicts_with("local"),
-            )
-            .arg(
-                Arg::with_name("remove")
-                    .help("Remove tag instead of adding")
-                    .long_help("Remove tag from 'include' or 'exclude' list")
-                    .long("rm")
-                    .short("r"),
-            )
-            .arg(
-                Arg::with_name("edit")
-                    .help("Open cache file in $EDITOR")
-                    .long_help(
-                        "Open cache file in $EDITOR. If $EDITOR is not defined will open in vim",
-                    )
-                    .long("edit")
-                    .short("e"),
-            )
-            .arg(
-                Arg::with_name("list")
-                    .help("List all config options and values")
-                    .long("list")
-                    .short("s"),
-            )
-            .arg(
-                Arg::with_name("name-only")
-                    .help("List only config option names")
-                    .long("name-only")
-                    .short("n"),
-            )
-    }
-
-    fn from_matches(m: &ArgMatches) -> Result<Box<Self>> {
-        Ok(Box::new(Self {
-            name: m.value_of("NAME").map(String::from),
-            value: m.value_of("VALUE").map(String::from),
-            local: m.is_present("local"),
-            global: m.is_present("global"),
-            remove: m.is_present("remove"),
-            edit: m.is_present("edit"),
-            list: m.is_present("list"),
-            name_only: m.is_present("name-only"),
-        }))
-    }
-
-    fn run(self, _: &ArgMatches) -> Result<()> {
+impl Run for ConfigCmd {
+    fn run(self) -> anyhow::Result<()> {
         let mut workspace = Workspace::new()?;
         let config = workspace.config_mut();
         let location = match (self.local, self.global) {
@@ -143,23 +68,10 @@ impl CliCommand for ConfigCommand {
     }
 }
 
-impl ConfigCommand {
-    fn print_help(long: bool) -> Result<()> {
-        let mut sub_app = ConfigCommand::app(SubCommand::with_name("config"));
-
-        if long {
-            sub_app.print_long_help()?;
-        } else {
-            sub_app.print_help()?;
-        }
-        println!();
-
-        Ok(())
-    }
-
+impl ConfigCmd {
     fn no_value(&self, _config: &Config) -> Result<()> {
         if !self.edit && !self.list && !self.name_only {
-            ConfigCommand::print_help(false)?;
+            ConfigCmd::command().print_long_help()?;
         }
 
         Ok(())
