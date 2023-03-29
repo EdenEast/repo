@@ -1,43 +1,12 @@
-use super::CliCommand;
-use anyhow::{anyhow, bail, Result};
-use clap::{App, AppSettings, Arg, ArgMatches};
-use repo_cli::{prelude::*, util};
+use anyhow::{anyhow, bail};
+use repo_cli::{util, Workspace};
 
-pub struct InspectCommand {
-    name: String,
-    format: Option<String>,
-}
+use crate::cli::InsepctCmd;
 
-impl CliCommand for InspectCommand {
-    fn app<'a, 'b: 'a>(app: App<'a, 'b>) -> App<'a, 'b> {
-        app.about("Inspect a repository and view it's properties")
-            .settings(&[AppSettings::NextLineHelp])
-            .arg(
-                Arg::with_name("NAME")
-                    .help("Name of the repository to be inspected")
-                    .takes_value(true),
-            )
-            .arg(
-                Arg::with_name("format")
-                    .help("Define the output format of the inspection")
-                    .long("format")
-                    .short("f")
-                    .takes_value(true)
-                    .possible_values(&["json", "toml"]),
-            )
-    }
+use super::ExecuteableCmd;
 
-    fn from_matches(m: &ArgMatches) -> Result<Box<Self>> {
-        Ok(Box::new(Self {
-            name: m
-                .value_of("NAME")
-                .map(String::from)
-                .expect("NAME is a required argument"),
-            format: m.value_of("format").map(String::from),
-        }))
-    }
-
-    fn run(self, _: &ArgMatches) -> Result<()> {
+impl ExecuteableCmd for InsepctCmd {
+    fn execute(self) -> anyhow::Result<()> {
         let workspace = Workspace::new()?;
         let repository = workspace
             .get_repository(&self.name)

@@ -1,72 +1,11 @@
-use super::CliCommand;
-use anyhow::{anyhow, Context, Result};
-use clap::{values_t, App, AppSettings, Arg, ArgMatches};
+use crate::cli::ForeachCmd;
+use anyhow::{anyhow, Context};
 use repo_cli::{prelude::*, util::process};
 
-pub struct ForeachCommand {
-    cmd: String,
-    tags: Option<Vec<String>>,
-    local: bool,
-    global: bool,
-    all: bool,
-}
+use super::ExecuteableCmd;
 
-impl CliCommand for ForeachCommand {
-    fn app<'a, 'b: 'a>(app: App<'a, 'b>) -> App<'a, 'b> {
-        app.about("Execute command for every tracked repository")
-            .settings(&[AppSettings::NextLineHelp])
-            .arg(
-                Arg::with_name("CMD")
-                    .help("Shell command to be executed")
-                    .long_help("Shell command to be executed on all repositoies")
-                    .required(true),
-            )
-            .arg(
-                Arg::with_name("local")
-                    .help("Perform operation on only local repositories")
-                    .long("local")
-                    .short("l")
-                    .conflicts_with_all(&["all", "global"]),
-            )
-            .arg(
-                Arg::with_name("global")
-                    .help("Perform operation on only global repositories")
-                    .long("global")
-                    .short("g")
-                    .conflicts_with_all(&["local", "all"]),
-            )
-            .arg(
-                Arg::with_name("all")
-                    .help("Perform operation on all repositories, global and local")
-                    .long("all")
-                    .short("a")
-                    .conflicts_with_all(&["local", "global"]),
-            )
-            .arg(
-                Arg::with_name("tag")
-                    .help("Perform operation on only repositories that contain tag")
-                    .long("tag")
-                    .short("t")
-                    .takes_value(true)
-                    .multiple(true)
-                    .number_of_values(1),
-            )
-    }
-
-    fn from_matches(m: &ArgMatches) -> Result<Box<Self>> {
-        Ok(Box::new(Self {
-            cmd: m
-                .value_of("CMD")
-                .map(String::from)
-                .expect("CMD is a required argument"),
-            tags: values_t!(m, "tag", String).ok(),
-            local: m.is_present("local"),
-            global: m.is_present("global"),
-            all: m.is_present("all"),
-        }))
-    }
-
-    fn run(self, _: &ArgMatches) -> Result<()> {
+impl ExecuteableCmd for ForeachCmd {
+    fn execute(self) -> anyhow::Result<()> {
         let workspace = Workspace::new()?;
 
         let mut repositories = match (self.global, self.local, self.all) {

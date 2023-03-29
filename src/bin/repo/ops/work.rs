@@ -1,45 +1,12 @@
-use super::CliCommand;
-use anyhow::{anyhow, Result};
-use clap::{App, AppSettings, Arg, ArgMatches};
-use repo_cli::prelude::*;
+use anyhow::anyhow;
+use repo_cli::Workspace;
 
-pub struct WorkCommand {
-    name: String,
-    quick: bool,
-}
+use crate::cli::WorkCmd;
 
-impl CliCommand for WorkCommand {
-    fn app<'a, 'b: 'a>(app: App<'a, 'b>) -> App<'a, 'b> {
-        app.about("Generate work command for a repostory")
-            .settings(&[AppSettings::Hidden, AppSettings::NextLineHelp])
-            .arg(
-                Arg::with_name("NAME")
-                    .help("Name of the tracked repository to be worked on")
-                    .required(true),
-            )
-            .arg(
-                Arg::with_name("quick")
-                    .help("Only change directory to repository in workspace")
-                    .long_help(
-                        "Only change directory to repository in workspace.\n\
-                        This will not run the after 'work' post hook.",
-                    )
-                    .long("quick")
-                    .short("q"),
-            )
-    }
+use super::ExecuteableCmd;
 
-    fn from_matches(m: &ArgMatches) -> Result<Box<Self>> {
-        Ok(Box::new(Self {
-            name: m
-                .value_of("NAME")
-                .map(String::from)
-                .expect("NAME is a required argument"),
-            quick: m.is_present("quick"),
-        }))
-    }
-
-    fn run(self, _: &ArgMatches) -> Result<()> {
+impl ExecuteableCmd for WorkCmd {
+    fn execute(self) -> anyhow::Result<()> {
         let workspace = Workspace::new()?;
         let repo = workspace
             .get_repository(&self.name)

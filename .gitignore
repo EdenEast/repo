@@ -1,6 +1,7 @@
 # File created using '.gitignore Generator' for Visual Studio Code: https://bit.ly/vscode-gig
 
 .direnv/
+.envrc
 result
 
 # Created by https://www.gitignore.io/api/linux,visualstudiocode,rust,vim,windows
