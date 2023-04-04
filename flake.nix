@@ -35,6 +35,7 @@
         packages.default = repo;
 
         devShells.default = pkgs.mkShell {
+          name = "repo";
           inputsFrom = [ repo ];
           nativeBuildInputs = with pkgs; [
             # Core rust
@@ -45,8 +46,6 @@
             rustfmt
             clippy
           ];
-
-          RUST_SRC_PATH = "${pkgs.rust-src}/rustlib/src/rust/library";
         };
       });
 }
