@@ -1,49 +1,52 @@
 {
   description = "Repo - Repository management utility";
+
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-    flake-utils.url = "github:numtide/flake-utils";
-    fenix = {
-      url = "github:nix-community/fenix";
+    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
+    flake-utils = {
+      url = "github:numtide/flake-utils";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    naersk.url = "github:nmattia/naersk";
+    crane = {
+      url = "github:ipetkov/crane";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, flake-utils, fenix, naersk, nixpkgs, ... }:
-    flake-utils.lib.eachDefaultSystem (
-      system:
-        let
-          pkgs = nixpkgs.legacyPackages.${system} // { inherit (fenix.packages.${system}.stable) cargo rustc rust-src clippy-preview rustfmt-preview; };
+  outputs = { self, nixpkgs, flake-utils, crane }:
+    flake-utils.lib.eachDefaultSystem (system:
+      let
+        pkgs = import nixpkgs {
+          inherit system;
+        };
 
-          manifest = builtins.fromTOML (builtins.readFile ./Cargo.toml);
-          version = manifest.package.version;
+        inherit (pkgs) lib;
+        craneLib = crane.lib.${system};
 
-          naersk-lib = (
-            naersk.lib."${system}".override {
-              cargo = pkgs.cargo;
-              rustc = pkgs.rustc;
-            }
-          );
+        repo = craneLib.buildPackage {
+          src = ./.;
+          buildInputs = with pkgs; [ openssl libiconv ]
+            ++ (lib.optionals stdenv.isDarwin [ darwin.apple_sdk.frameworks.Security ]);
+          nativeBuildInputs = with pkgs; [ pkg-config ];
+          PKG_CONFIG_PATH = "${pkgs.openssl.dev}/lib/pkgconfig";
+        };
+      in
+      rec {
+        packages.default = repo;
 
-          repo = naersk-lib.buildPackage {
-            inherit version;
-            pname = "repo";
-            buildInputs = with pkgs; [ openssl ];
-            nativeBuildInputs = with pkgs; [ pkg-config ];
-            PKG_CONFIG_PATH = "${pkgs.openssl.dev}/lib/pkgconfig";
-            root = ./.;
-          };
-        in
-          rec {
-            packages.repo = repo;
-            defaultPackage = self.packages.${system}.repo;
+        devShells.default = pkgs.mkShell {
+          inputsFrom = [ repo ];
+          nativeBuildInputs = with pkgs; [
+            # Core rust
+            cargo
+            rustc
 
-            apps.repo = flake-utils.lib.mkApp { drv = packages.repo; };
-            defaultApp = apps.repo;
+            # Development tools
+            rustfmt
+            clippy
+          ];
 
-            devShell = import ./shell.nix { inherit pkgs; };
-          }
-    );
-
+          RUST_SRC_PATH = "${rust-src}/rustlib/src/rust/library";
+        };
+      });
 }
