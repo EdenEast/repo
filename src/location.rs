@@ -1,16 +1,11 @@
 use std::fmt;
 
 /// Enum to state between a global config/cache location
-#[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
+#[derive(Debug, Default, Copy, Clone, Eq, PartialEq, Hash)]
 pub enum Location {
+    #[default]
     Global,
     Local,
-}
-
-impl Default for Location {
-    fn default() -> Self {
-        Location::Global
-    }
 }
 
 impl fmt::Display for Location {
