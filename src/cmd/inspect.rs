@@ -1,9 +1,9 @@
 use anyhow::{anyhow, bail};
 use repo_cli::{util, Workspace};
 
-use super::{InsepctCmd, Run};
+use super::{InspectCmd, Run};
 
-impl Run for InsepctCmd {
+impl Run for InspectCmd {
     fn run(self) -> anyhow::Result<()> {
         let workspace = Workspace::new()?;
         let repository = workspace

@@ -23,7 +23,7 @@ pub enum Cmd {
     Config(ConfigCmd),
     Edit(EditCmd),
     Foreach(ForeachCmd),
-    Insepct(InsepctCmd),
+    Inspect(InspectCmd),
     List(ListCmd),
     Remove(RemoveCmd),
     Tag(TagCmd),
@@ -161,7 +161,7 @@ pub struct ConfigCmd {
     pub edit: bool,
 
     /// List all config options and values
-    #[arg(short = 'l', long, default_value_t = false)]
+    #[arg(short = 's', long, default_value_t = false)]
     pub list: bool,
 
     /// List only config option names
@@ -285,7 +285,7 @@ pub struct InitCmd {
 /// Inspect a repository and view it's properties
 #[derive(Debug, Parser)]
 #[command(disable_colored_help(true), disable_version_flag(true))]
-pub struct InsepctCmd {
+pub struct InspectCmd {
     /// Name of the repository to be inspected
     #[arg()]
     pub name: String,
