@@ -7,45 +7,67 @@
       url = "github:numtide/flake-utils";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    rust-overlay = {
+      url = "github:oxalica/rust-overlay";
+      inputs = {
+        nixpkgs.follows = "nixpkgs";
+        flake-utils.follows = "flake-utils";
+      };
+    };
     crane = {
       url = "github:ipetkov/crane";
-      inputs.nixpkgs.follows = "nixpkgs";
+      inputs = {
+        nixpkgs.follows = "nixpkgs";
+        flake-utils.follows = "flake-utils";
+      };
     };
   };
 
-  outputs = { self, nixpkgs, flake-utils, crane }:
-    flake-utils.lib.eachDefaultSystem (system:
-      let
-        pkgs = import nixpkgs {
-          inherit system;
-        };
+  outputs = { self, nixpkgs, flake-utils, rust-overlay, crane }:
+    flake-utils.lib.eachDefaultSystem
+      (system:
+        let
+          pkgs = import nixpkgs {
+            inherit system;
+            overlays = [ (import rust-overlay) ];
+          };
 
-        inherit (pkgs) lib;
-        craneLib = crane.lib.${system};
+          rustToolchain = pkgs.rust-bin.stable.latest.default.override {
+            extensions = [ "rust-src" ];
+          };
 
-        repo = craneLib.buildPackage {
-          src = ./.;
-          buildInputs = with pkgs; [ openssl libiconv ]
-            ++ (lib.optionals stdenv.isDarwin [ darwin.apple_sdk.frameworks.Security ]);
-          nativeBuildInputs = with pkgs; [ pkg-config ];
-          PKG_CONFIG_PATH = "${pkgs.openssl.dev}/lib/pkgconfig";
-        };
-      in
-      rec {
-        packages.default = repo;
+          inherit (pkgs) lib;
+          craneLib = crane.lib.${system};
 
-        devShells.default = pkgs.mkShell {
-          name = "repo";
-          inputsFrom = [ repo ];
-          nativeBuildInputs = with pkgs; [
-            # Core rust
-            cargo
-            rustc
+          repo = craneLib.buildPackage {
+            src = ./.;
+            buildInputs = with pkgs; [ openssl libiconv ]
+              ++ (lib.optionals stdenv.isDarwin [ darwin.apple_sdk.frameworks.Security ]);
+            nativeBuildInputs = with pkgs; [ pkg-config ];
+            PKG_CONFIG_PATH = "${pkgs.openssl.dev}/lib/pkgconfig";
+          };
+        in
+        rec {
+          checks = { inherit repo; };
 
-            # Development tools
-            rustfmt
-            clippy
-          ];
-        };
-      });
+          apps = {
+            repo = flake-utils.lib.mkApp {
+              dev = repo;
+            };
+            default = apps.repo;
+          };
+
+          packages = {
+            inherit repo;
+            default = repo;
+          };
+
+          devShells.default = pkgs.mkShell {
+            name = "repo";
+            inputsFrom = [ repo ];
+            nativeBuildInputs = with pkgs; [
+              rustToolchain
+            ];
+          };
+        });
 }
