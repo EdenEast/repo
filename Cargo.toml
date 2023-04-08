@@ -52,3 +52,7 @@ native-tls = { version = "0.2", optional = true }
 [[bin]]
 name = "repo"
 path = "./src/main.rs"
+
+[build-dependencies]
+clap = "4.1.11"
+clap_mangen = "0.2.10"

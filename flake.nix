@@ -43,8 +43,11 @@
             src = ./.;
             buildInputs = with pkgs; [ openssl libiconv ]
               ++ (lib.optionals stdenv.isDarwin [ darwin.apple_sdk.frameworks.Security ]);
-            nativeBuildInputs = with pkgs; [ pkg-config ];
+            nativeBuildInputs = with pkgs; [ pkg-config installShellFiles ];
             PKG_CONFIG_PATH = "${pkgs.openssl.dev}/lib/pkgconfig";
+            preFixup = ''
+              installManPage ./target/man/*
+            '';
           };
         in
         rec {
