@@ -33,7 +33,11 @@ pub enum Cmd {
 
 /// Add a repository to be tracked by repo
 #[derive(Debug, Parser)]
-#[command(disable_colored_help(true), disable_version_flag(true))]
+#[command(
+    name = "repo add",
+    disable_colored_help(true),
+    disable_version_flag(true)
+)]
 pub struct AddCmd {
     /// A url link to the repository's remote origin
     ///
@@ -47,7 +51,8 @@ pub struct AddCmd {
     ///   * <path-to-repo>
     ///     - This option uses the config file to construct the url to the
     ///       remote repository.
-    /// If url or scheme is not defined in the config file they will be defaulted to:
+    /// If url or scheme is not defined in the config file they will be
+    /// defaulted to:
     ///   scheme:   'https'
     ///   host:     'github.com'
     ///   ssh_user: 'git'
@@ -106,8 +111,9 @@ pub struct AddCmd {
 
     /// Write repository to local cache
     ///
-    /// Local cache is defined by $REPO_LOCAL_PATH environment variable.  If env
-    /// var is not set then repo will default to your system's local data folder:
+    /// Local cache is defined by '$REPO_LOCAL_PATH' environment variable.
+    /// If env var is not set then repo will default to your system's local
+    /// data folder:
     ///   - linux: $HOME/.local/share/repo
     ///   - windows: C:\Users\<USER>\AppData\Local\repo
     ///   - macos: /Users/<USER>/Library/Application Support/repo
@@ -130,7 +136,11 @@ pub struct AddCmd {
 
 /// Get or set configuration options
 #[derive(Debug, Parser)]
-#[command(disable_colored_help(true), disable_version_flag(true))]
+#[command(
+    name = "repo config",
+    disable_colored_help(true),
+    disable_version_flag(true)
+)]
 pub struct ConfigCmd {
     /// Name of configuration option
     #[arg(index = 1, default_value = None)]
@@ -171,7 +181,11 @@ pub struct ConfigCmd {
 
 /// Edit a repository tracked by repo
 #[derive(Debug, Parser)]
-#[command(disable_colored_help(true), disable_version_flag(true))]
+#[command(
+    name = "repo edit",
+    disable_colored_help(true),
+    disable_version_flag(true)
+)]
 pub struct EditCmd {
     /// Name of the repository to be edited
     #[arg()]
@@ -246,7 +260,11 @@ pub struct EditCmd {
 
 /// Execute command for every tracked repository
 #[derive(Debug, Parser)]
-#[command(disable_colored_help(true), disable_version_flag(true))]
+#[command(
+    name = "repo foreach",
+    disable_colored_help(true),
+    disable_version_flag(true)
+)]
 pub struct ForeachCmd {
     /// Shell command to be executed
     #[arg()]
@@ -271,7 +289,11 @@ pub struct ForeachCmd {
 
 /// Prints the shell function used to integrate repo with shell
 #[derive(Debug, Parser)]
-#[command(disable_colored_help(true), disable_version_flag(true))]
+#[command(
+    name = "repo init",
+    disable_colored_help(true),
+    disable_version_flag(true)
+)]
 pub struct InitCmd {
     /// Name of the shell the shell function will generate
     #[arg(short, long)] // TODO: possbile values
@@ -284,7 +306,11 @@ pub struct InitCmd {
 
 /// Inspect a repository and view it's properties
 #[derive(Debug, Parser)]
-#[command(disable_colored_help(true), disable_version_flag(true))]
+#[command(
+    name = "repo inspect",
+    disable_colored_help(true),
+    disable_version_flag(true)
+)]
 pub struct InspectCmd {
     /// Name of the repository to be inspected
     #[arg()]
@@ -297,6 +323,7 @@ pub struct InspectCmd {
 
 /// List repositories tracked by repo
 #[derive(Debug, Parser)]
+#[clap(name = "repo list")]
 #[command(disable_colored_help(true), disable_version_flag(true))]
 pub struct ListCmd {
     /// Show repositories that contain a tag
@@ -318,7 +345,11 @@ pub struct ListCmd {
 
 /// Remove a repository tracked by repo
 #[derive(Debug, Parser)]
-#[command(disable_colored_help(true), disable_version_flag(true))]
+#[command(
+    name = "repo remove",
+    disable_colored_help(true),
+    disable_version_flag(true)
+)]
 pub struct RemoveCmd {
     /// Name of repository
     #[arg(short, long)]
@@ -331,7 +362,11 @@ pub struct RemoveCmd {
 
 /// Update tracked repositories in repo with their remotes
 #[derive(Debug, Parser)]
-#[command(disable_colored_help(true), disable_version_flag(true))]
+#[command(
+    name = "repo update",
+    disable_colored_help(true),
+    disable_version_flag(true)
+)]
 pub struct UpdateCmd {
     /// Perform operation on only local repositories
     #[arg(short, long, default_value_t = false)]
@@ -352,7 +387,11 @@ pub struct UpdateCmd {
 
 /// Generate work command for a repostory
 #[derive(Debug, Parser)]
-#[command(disable_colored_help(true), disable_version_flag(true))]
+#[command(
+    name = "repo work",
+    disable_colored_help(true),
+    disable_version_flag(true)
+)]
 pub struct WorkCmd {
     /// Name of the tracked repository to be worked on
     #[arg()]
@@ -367,7 +406,11 @@ pub struct WorkCmd {
 
 /// Manage tags
 #[derive(Debug, Parser)]
-#[command(disable_colored_help(true), disable_version_flag(true))]
+#[command(
+    name = "repo tag",
+    disable_colored_help(true),
+    disable_version_flag(true)
+)]
 pub struct TagCmd {
     #[clap(subcommand)]
     pub cmd: TagSubCmd,
@@ -383,10 +426,13 @@ pub enum TagSubCmd {
 
 /// Add a tag to repo
 #[derive(Debug, Parser)]
-#[command(disable_colored_help(true), disable_version_flag(true))]
+#[command(
+    name = "repo tag add",
+    disable_colored_help(true),
+    disable_version_flag(true)
+)]
 pub struct TagAddCmd {
     /// Name of the tag
-    #[arg()]
     pub name: String,
 
     /// Override the default path of an attached repository in the workspace.
@@ -416,14 +462,16 @@ pub struct TagAddCmd {
     #[arg(short, long, verbatim_doc_comment, default_value = None)]
     pub work: Option<String>,
 
-    /// Set the tag priority. Tags will be applied from lowest to highest. Priority ties
-    /// are resolved alphabetically
+    /// Set the tag priority. Tags will be applied from lowest to highest.
+    /// Priority ties are resolved alphabetically
+    #[arg(short = 'n', long, verbatim_doc_comment, default_value = None)]
     pub priority: Option<i32>,
 
     /// Write repository to local cache
     ///
-    /// Local cache is defined by $REPO_LOCAL_PATH environment variable.  If env
-    /// var is not set then repo will default to your system's local data folder:
+    /// Local cache is defined by '$REPO_LOCAL_PATH' environment variable.
+    /// If env var is not set then repo will default to your system's local
+    /// data folder:
     ///   - linux: $HOME/.local/share/repo
     ///   - windows: C:\\Users\\<USER>\\AppData\\Local\\repo
     ///   - macos: /Users/<USER>/Library/Application Support/repo
@@ -433,17 +481,22 @@ pub struct TagAddCmd {
 
 /// Edit a tag stored in repo
 #[derive(Debug, Parser)]
-#[command(disable_colored_help(true), disable_version_flag(true))]
+#[command(
+    name = "repo tag edit",
+    disable_colored_help(true),
+    disable_version_flag(true)
+)]
 pub struct TagEditCmd {
     /// Name of the repository to be edited
-    #[arg(short, long, default_value = None)]
+    #[arg(default_value = None)]
     pub name: String,
 
     /// Override the default path of an attached repository in the workspace
     ///
-    /// By default, the workspace path of a repository is based on the name of the repository.
-    /// This option will override this behaviour and set the workspace path.
-    /// If a repository also has a path definition it will override a tag's.
+    /// By default, the workspace path of a repository is based on the name of
+    /// the repository.  This option will override this behaviour and set the
+    /// workspace path.  If a repository also has a path definition it will
+    /// override a tag's.
     ///
     /// Note: Relative paths are relative to the workspace root.
     #[arg(short, long, verbatim_doc_comment, default_value = None)]
@@ -469,7 +522,7 @@ pub struct TagEditCmd {
     ///
     /// Tags will be applied from lowest to highest. Priority ties
     /// are resolved alphabetically
-    #[arg(short, long, default_value = None)]
+    #[arg(short = 'n', long, default_value = None)]
     pub priority: Option<i32>,
 
     /// Change tag to be a stored in the local cache
@@ -489,7 +542,11 @@ pub struct TagEditCmd {
 
 /// List tags stored in repo
 #[derive(Debug, Parser)]
-#[command(disable_colored_help(true), disable_version_flag(true))]
+#[command(
+    name = "repo tag list",
+    disable_colored_help(true),
+    disable_version_flag(true)
+)]
 pub struct TagListCmd {
     /// Show only local tags
     #[arg(short, long, default_value_t = false)]
@@ -502,7 +559,11 @@ pub struct TagListCmd {
 
 /// Remove a tag from repo
 #[derive(Debug, Parser)]
-#[command(disable_colored_help(true), disable_version_flag(true))]
+#[command(
+    name = "repo tag remove",
+    disable_colored_help(true),
+    disable_version_flag(true)
+)]
 pub struct TagRemoveCmd {
     /// Name of the tag to be removed from repo
     #[arg(help = "Name of tag")]
@@ -512,3 +573,5 @@ pub struct TagRemoveCmd {
     #[arg(short, long, help = "Force removal of tag", default_value_t = false)]
     pub force: bool,
 }
+
+// vim: textwidth=80
