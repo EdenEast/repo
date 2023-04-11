@@ -24,6 +24,7 @@ pub enum Cmd {
     Edit(EditCmd),
     Foreach(ForeachCmd),
     Inspect(InspectCmd),
+    Init(InitCmd),
     List(ListCmd),
     Remove(RemoveCmd),
     Tag(TagCmd),
@@ -296,7 +297,7 @@ pub struct ForeachCmd {
 )]
 pub struct InitCmd {
     /// Name of the shell the shell function will generate
-    #[arg(short, long)] // TODO: possbile values
+    #[arg(value_parser = ["bash", "zsh", "fish"])] // TODO: possbile values
     pub shell: String,
 
     /// Intilaize with fzf integration

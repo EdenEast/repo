@@ -27,6 +27,7 @@ impl Run for Cli {
             Cmd::Edit(cmd) => cmd.run(),
             Cmd::Foreach(cmd) => cmd.run(),
             Cmd::Inspect(cmd) => cmd.run(),
+            Cmd::Init(cmd) => cmd.run(),
             Cmd::List(cmd) => cmd.run(),
             Cmd::Remove(cmd) => cmd.run(),
             Cmd::Tag(cmd) => cmd.run(),

@@ -33,6 +33,7 @@ fn generate_manpages() -> Result<()> {
         ManPage::new("repo-edit", EditCmd::command()),
         ManPage::new("repo-foreach", ForeachCmd::command()),
         ManPage::new("repo-inspect", InspectCmd::command()),
+        ManPage::new("repo-init", InitCmd::command()),
         ManPage::new("repo-list", ListCmd::command()),
         ManPage::new("repo-remove", RemoveCmd::command()),
         ManPage::new("repo-tag", TagCmd::command()),
