@@ -139,7 +139,7 @@ impl Workspace {
             git::merge(&workspace_path, use_cli)?;
         } else {
             let remote_name =
-                repository.remotes.get(0).map(|r| &r.name).ok_or_else(|| {
+                repository.remotes.first().map(|r| &r.name).ok_or_else(|| {
                     anyhow!("Repository: {} does not have a remote", repository.name)
                 })?;
 
