@@ -30,7 +30,7 @@ panic = 'abort'   # Remove stack unwinding code for panic
 
 [dependencies]
 anyhow = "1.0.80"
-clap = { version = "4.1.11", features = [ "cargo", "derive" ] }
+clap = { version = "4.5.1", features = [ "cargo", "derive" ] }
 dialoguer = "0.10.3"
 dirs-next = "2.0.0"
 git2 = "0.18.2"
@@ -54,5 +54,5 @@ name = "repo"
 path = "./src/main.rs"
 
 [build-dependencies]
-clap = "4.1.11"
+clap = "4.5.1"
 clap_mangen = "0.2.10"
