@@ -31,7 +31,7 @@ panic = 'abort'   # Remove stack unwinding code for panic
 [dependencies]
 anyhow = "1.0.80"
 clap = { version = "4.5.3", features = [ "cargo", "derive" ] }
-dialoguer = "0.10.3"
+dialoguer = "0.11.0"
 dirs-next = "2.0.0"
 git2 = "0.18.2"
 git2_credentials = "0.13.0"
