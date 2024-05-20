@@ -29,7 +29,7 @@ opt-level = 'z'   # Optimize for size
 panic = 'abort'   # Remove stack unwinding code for panic
 
 [dependencies]
-anyhow = "1.0.82"
+anyhow = "1.0.86"
 clap = { version = "4.5.4", features = [ "cargo", "derive" ] }
 dialoguer = "0.10.3"
 dirs-next = "2.0.0"
